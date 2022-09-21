@@ -1,0 +1,291 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/activity_custom_calendar"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    android:orientation="vertical"
+    tools:context="com.digitalinterruption.lex.calender.CalendarCustomView">
+
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="visible">
+
+        <TextView
+            android:id="@+id/tvBleeding"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/_10sdp"
+            android:layout_marginTop="@dimen/_10sdp"
+            android:fontFamily="@font/arialnovabold"
+            android:text="BLEEDING"
+            android:textColor="@color/black"
+            android:textSize="@dimen/_7sdp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/iv1"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_chainStyle="packed" />
+
+        <androidx.constraintlayout.utils.widget.ImageFilterView
+            android:id="@+id/iv1"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginStart="@dimen/_10sdp"
+            android:src="@color/darkYellow"
+            app:layout_constraintBottom_toBottomOf="@id/tvBleeding"
+            app:layout_constraintDimensionRatio="1:1"
+            app:layout_constraintEnd_toStartOf="@+id/tvSymptoms"
+            app:layout_constraintStart_toEndOf="@id/tvBleeding"
+            app:layout_constraintTop_toTopOf="@id/tvBleeding"
+            app:roundPercent="1" />
+
+        <TextView
+            android:id="@+id/tvSymptoms"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/_10sdp"
+            android:layout_marginTop="@dimen/_10sdp"
+            android:layout_marginBottom="@dimen/_10sdp"
+            android:fontFamily="@font/arialnovabold"
+            android:text="SYMPTOMS"
+            android:textColor="@color/black"
+            android:textSize="@dimen/_7sdp"
+            app:layout_constraintBottom_toBottomOf="@id/tvBleeding"
+            app:layout_constraintEnd_toStartOf="@id/iv2"
+            app:layout_constraintStart_toEndOf="@id/iv1"
+            app:layout_constraintTop_toTopOf="@id/tvBleeding" />
+
+        <androidx.constraintlayout.utils.widget.ImageFilterView
+            android:id="@+id/iv2"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginStart="@dimen/_10sdp"
+            android:src="@color/green"
+            app:layout_constraintBottom_toBottomOf="@id/tvSymptoms"
+            app:layout_constraintDimensionRatio="1:1"
+            app:layout_constraintEnd_toStartOf="@id/tvOvulation"
+            app:layout_constraintStart_toEndOf="@id/tvSymptoms"
+            app:layout_constraintTop_toTopOf="@id/tvSymptoms"
+            app:roundPercent="1" />
+
+        <TextView
+            android:id="@+id/tvOvulation"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/_10sdp"
+            android:layout_marginTop="@dimen/_10sdp"
+            android:layout_marginBottom="@dimen/_10sdp"
+            android:fontFamily="@font/arialnovabold"
+            android:text="OVULATION"
+            android:textColor="@color/black"
+            android:textSize="@dimen/_7sdp"
+            app:layout_constraintBottom_toBottomOf="@id/tvBleeding"
+            app:layout_constraintEnd_toStartOf="@+id/iv3"
+            app:layout_constraintStart_toEndOf="@id/iv2"
+            app:layout_constraintTop_toTopOf="@id/tvBleeding" />
+
+        <androidx.constraintlayout.utils.widget.ImageFilterView
+            android:id="@+id/iv3"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginStart="@dimen/_10sdp"
+            android:src="@color/ov"
+            app:layout_constraintBottom_toBottomOf="@id/tvOvulation"
+            app:layout_constraintDimensionRatio="1:1"
+            app:layout_constraintEnd_toStartOf="@+id/tvPMS"
+            app:layout_constraintStart_toEndOf="@id/tvOvulation"
+            app:layout_constraintTop_toTopOf="@id/tvOvulation"
+            app:roundPercent="1" />
+
+
+        <TextView
+            android:id="@+id/tvPMS"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/_10sdp"
+            android:layout_marginTop="@dimen/_10sdp"
+            android:layout_marginBottom="@dimen/_10sdp"
+            android:fontFamily="@font/arialnovabold"
+            android:text="PMS"
+            android:textColor="@color/black"
+            android:textSize="@dimen/_7sdp"
+            app:layout_constraintBottom_toBottomOf="@id/tvBleeding"
+            app:layout_constraintEnd_toStartOf="@+id/iv4"
+            app:layout_constraintStart_toEndOf="@id/iv3"
+            app:layout_constraintTop_toTopOf="@id/tvBleeding" />
+
+        <androidx.constraintlayout.utils.widget.ImageFilterView
+            android:id="@+id/iv4"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginStart="@dimen/_10sdp"
+            android:layout_marginEnd="@dimen/_10sdp"
+            android:src="@color/pms"
+            app:layout_constraintBottom_toBottomOf="@id/tvPMS"
+            app:layout_constraintDimensionRatio="1:1"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/tvPMS"
+            app:layout_constraintTop_toTopOf="@id/tvPMS"
+            app:roundPercent="1" />
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/white"
+        android:orientation="horizontal"
+        android:paddingTop="8dp"
+        android:paddingBottom="8dp">
+
+        <ImageView
+            android:id="@+id/previous_month"
+            android:layout_width="30sp"
+            android:layout_height="30sp"
+            android:layout_gravity="left|center"
+            android:layout_weight="1"
+            android:contentDescription="@string/app_name"
+            android:padding="3sp"
+            android:rotation="180"
+            android:src="@drawable/white_next_icon"
+            app:tint="@color/black" />
+
+        <TextView
+            android:id="@+id/display_current_date"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center|top"
+            android:layout_marginTop="4dp"
+            android:layout_weight="3"
+            android:fontFamily="@font/arialnovabold"
+            android:gravity="center"
+            android:text="current date"
+            android:textAllCaps="true"
+            android:textColor="@color/black"
+            android:textSize="16sp" />
+
+        <ImageView
+            android:id="@+id/next_month"
+            android:layout_width="30sp"
+            android:layout_height="30sp"
+            android:layout_gravity="left|center"
+            android:layout_weight="1"
+            android:contentDescription="@string/app_name"
+            android:padding="3sp"
+            android:src="@drawable/white_next_icon"
+            app:tint="@color/black" />
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0.5sp"
+        android:background="#F5F5F5" />
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/white"
+        android:orientation="horizontal"
+        android:paddingTop="8dp"
+        android:paddingBottom="8dp">
+
+        <TextView
+            android:id="@+id/sun"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:layout_weight="1"
+            android:fontFamily="@font/arialnovabold"
+            android:gravity="center"
+            android:text="@string/sun"
+            android:textColor="@color/black" />
+
+        <TextView
+            android:id="@+id/mon"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:layout_weight="1"
+            android:fontFamily="@font/arialnovabold"
+            android:gravity="center"
+
+            android:text="@string/mon"
+            android:textColor="@color/black" />
+
+        <TextView
+            android:id="@+id/tue"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:layout_weight="1"
+            android:fontFamily="@font/arialnovabold"
+            android:gravity="center"
+            android:text="@string/tue"
+
+            android:textColor="@color/black" />
+
+        <TextView
+            android:id="@+id/wed"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:layout_weight="1"
+            android:fontFamily="@font/arialnovabold"
+            android:gravity="center"
+            android:text="@string/wed"
+
+            android:textColor="@color/black" />
+
+        <TextView
+            android:id="@+id/thu"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:layout_weight="1"
+            android:fontFamily="@font/arialnovabold"
+            android:gravity="center"
+            android:text="@string/thu"
+
+            android:textColor="@color/black" />
+
+        <TextView
+            android:id="@+id/fri"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:layout_weight="1"
+            android:fontFamily="@font/arialnovabold"
+            android:gravity="center"
+            android:text="@string/fri"
+
+            android:textColor="@color/black" />
+
+        <TextView
+            android:id="@+id/sat"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:layout_weight="1"
+            android:fontFamily="@font/arialnovabold"
+            android:gravity="center"
+            android:text="@string/sat"
+
+            android:textColor="@color/black" />
+    </LinearLayout>
+
+    <com.digitalinterruption.lex.calender.ExpandableHeightGridView
+        android:id="@+id/calendar_grid"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:clipToPadding="false"
+        android:horizontalSpacing="4sp"
+        android:numColumns="7"
+        android:verticalSpacing="4sp" />
+</LinearLayout>

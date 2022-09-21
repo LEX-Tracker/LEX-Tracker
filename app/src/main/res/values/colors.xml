@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="lightYellow">#fce679</color>
+    <color name="darkYellow">#FBDB48</color>
+    <color name="green">#00A88C</color>
+    <color name="black">#2A3747</color>
+    <color name="white">#FFFFFFFF</color>
+    <color name="grey">#AEAEAE</color>
+    <color name="third_black">#9D9D9D</color>
+    <color name="pms">#96aaff</color>
+    <color name="ov">#FF94B8</color>
+    <color name="blue">#2C75F3</color>
+
+
+    <color name="text_grey">#E4E0E0</color>
+
+
+</resources>

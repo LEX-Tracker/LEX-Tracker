@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="70dp"
+    android:layout_margin="16dp"
+    android:background="#999"
+    android:elevation="6dp"
+    app:cardCornerRadius="@dimen/_18sdp"
+
+    app:contentPadding="6dp"
+    app:layout_constraintBottom_toBottomOf="parent"
+    app:layout_constraintEnd_toEndOf="parent"
+    app:layout_constraintStart_toStartOf="parent"
+    app:layout_constraintTop_toTopOf="parent">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/title"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_gravity="center_vertical"
+            android:text="Bleeding"
+            android:textColor="@color/black"
+            android:textSize="16dp"
+            android:paddingStart="@dimen/_10sdp"
+            android:fontFamily="@font/arialnovabold"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/low"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <ImageView
+            android:id="@+id/low"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_centerVertical="true"
+            android:layout_gravity="center_vertical"
+            android:layout_toStartOf="@id/medium"
+            android:src="@drawable/my_day_bg"
+            app:layout_constraintBottom_toBottomOf="@id/medium"
+            app:layout_constraintEnd_toStartOf="@id/medium"
+            app:layout_constraintHorizontal_chainStyle="packed"
+            app:layout_constraintStart_toEndOf="@id/title"
+            app:layout_constraintTop_toTopOf="@id/medium" />
+
+        <TextView
+            android:id="@+id/txt_low"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:gravity="center"
+            android:text="LOW"
+            android:textColor="@color/black"
+            app:layout_constraintBottom_toBottomOf="@id/low"
+            app:layout_constraintEnd_toEndOf="@id/low"
+            app:layout_constraintStart_toStartOf="@id/low"
+            app:layout_constraintTop_toTopOf="@id/low" />
+
+        <ImageView
+            android:id="@+id/medium"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_centerVertical="true"
+            android:layout_gravity="center_vertical"
+            android:layout_marginHorizontal="6dp"
+            android:layout_toStartOf="@id/high"
+            android:src="@drawable/my_day_bg"
+            app:layout_constraintBottom_toBottomOf="@id/high"
+            app:layout_constraintEnd_toStartOf="@id/high"
+            app:layout_constraintStart_toEndOf="@id/low"
+            app:layout_constraintTop_toTopOf="@id/high" />
+
+        <TextView
+            android:id="@+id/txt_med"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:gravity="center"
+            android:text="MED"
+            android:textColor="@color/black"
+            app:layout_constraintBottom_toBottomOf="@id/medium"
+            app:layout_constraintEnd_toEndOf="@id/medium"
+            app:layout_constraintStart_toStartOf="@id/medium"
+            app:layout_constraintTop_toTopOf="@id/medium" />
+
+        <ImageView
+            android:id="@+id/high"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:layout_gravity="center_vertical"
+            android:src="@drawable/my_day_bg"
+            android:layout_marginEnd="@dimen/_10sdp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/medium"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/txt_high"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:gravity="center"
+            android:text="HIGH"
+            android:textColor="@color/black"
+            app:layout_constraintBottom_toBottomOf="@id/high"
+            app:layout_constraintEnd_toEndOf="@id/high"
+            app:layout_constraintStart_toStartOf="@id/high"
+            app:layout_constraintTop_toTopOf="@id/high" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+</androidx.cardview.widget.CardView>
