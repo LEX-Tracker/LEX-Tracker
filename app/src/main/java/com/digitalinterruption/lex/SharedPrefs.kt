@@ -1,26 +1,20 @@
 package com.digitalinterruption.lex
 
 import android.content.Context
-import android.content.SharedPreferences
+import com.digitalinterruption.lex.data.EncryptSharedPreferences
+import java.text.SimpleDateFormat
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 
-class SharedPrefs(context: Context?) {
 
-    var sharedPreferences: SharedPreferences? = null
+class SharedPrefs(context: Context) {
 
-    fun setPremium(value: Boolean) {
-        sharedPreferences?.edit()?.putBoolean("premium", value)?.apply()
-    }
-
-    fun getPremium(): Boolean {
-        if (sharedPreferences != null) {
-            return sharedPreferences!!.getBoolean("premium", false)
-        }
-        return false
-    }
+    var sharedPreferences = EncryptSharedPreferences.getInstance(context).sharedPreferences
+    val formatter: DateTimeFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")
 
     companion object {
-        var instance: SharedPrefs? = null
-        fun getInstance(context: Context?): SharedPrefs? {
+        lateinit var instance: SharedPrefs
+        fun getInstance(context: Context): SharedPrefs? {
             if (instance == null) {
                 instance = SharedPrefs(context)
             }
@@ -29,65 +23,99 @@ class SharedPrefs(context: Context?) {
     }
 
     init {
-        sharedPreferences = context?.getSharedPreferences("lex", Context.MODE_PRIVATE)
+        sharedPreferences = EncryptSharedPreferences.getInstance(context).sharedPreferences
+
     }
 
 
-    fun setPassCode(value: Boolean) {
-        sharedPreferences?.edit()?.putBoolean("passCode", value)?.apply()
+    fun setIsPinSet(value: Boolean) {
+        sharedPreferences?.edit()?.putBoolean("PIN_CODE_SET", value)?.apply()
     }
 
-    fun getPassCode(): Boolean {
+    fun getIsPinSet(): Boolean {
         if (sharedPreferences != null) {
-            return sharedPreferences!!.getBoolean("passCode", false)
+            return sharedPreferences!!.getBoolean("PIN_CODE_SET", false)
         }
         return false
     }
 
-
-    fun setPassPin(value: String) {
-        sharedPreferences?.edit()?.putString("passCodePin", value)?.apply()
+    fun setDuressPin(value: String?){
+        if (sharedPreferences != null) {
+            sharedPreferences?.edit()?.putString("DURESS_PIN", value)?.apply()
+        }
     }
 
-    fun getPassPin(): String? {
+    fun getDuressPin(): String? {
+        if (sharedPreferences != null){
+            return sharedPreferences!!.getString("DURESS_PIN", "")
+        }
+        return ""
+    }
+
+    fun setDuressPinEnabled(value: Boolean?){
+            sharedPreferences?.edit()?.putBoolean("DURESS_PIN_ENABLED", false)?.apply()
+    }
+
+    fun getDuressPinEnabled(): Boolean?{
+        if (sharedPreferences != null){
+            return sharedPreferences!!.getBoolean("DURESS_PIN_ENABLED", false)
+        }
+        return false
+    }
+
+    fun setIncorrectTries(value: Int){
+        sharedPreferences?.edit()?.putInt("INCORRECT_TRIES", value)?.apply()
+    }
+
+    fun getIncorrectTries(): Int{
+        if (sharedPreferences != null){
+            return sharedPreferences!!.getInt("INCORRECT_TRIES", 0)
+        }
+        return 0
+    }
+
+    fun setIsLockedOut(value: Boolean){
+        sharedPreferences?.edit()?.putBoolean("LOCKED_OUT", value)?.apply()
+    }
+
+    fun getIsLockedOut(): Boolean{
+        if (sharedPreferences != null){
+            return sharedPreferences!!.getBoolean("LOCKED_OUT", false)
+        }
+        return false
+    }
+
+    fun setLockOutDate(value: String){
+        val lockoutDate = value
+        sharedPreferences?.edit()?.putString("LOCKOUT_UNTIL", lockoutDate)?.apply()
+    }
+
+    fun getLockOutDate(): LocalDateTime? {
+
+        if (sharedPreferences != null){
+            return LocalDateTime.parse(sharedPreferences.getString("LOCKOUT_UNTIL", "01/01/1970 00:00"),formatter)
+        }
+        return LocalDateTime.parse("01/01/1970 00:00", formatter)
+    }
+
+    fun setPin(value: String) {
+        sharedPreferences?.edit()?.putString("passCodePin", value)?.apply()
+        this.setIsPinSet(true)
+    }
+
+    fun getPin(): String? {
         if (sharedPreferences != null) {
             return sharedPreferences!!.getString("passCodePin", "")
         }
         return ""
     }
 
-
-    fun setSecondPassCode(value: Boolean) {
-        sharedPreferences?.edit()?.putBoolean("secondPassCode", value)?.apply()
+    fun setIsDuressPin(value: Boolean) {
+        sharedPreferences?.edit()?.putBoolean("IS_DURESS_PIN", value)
     }
 
-    fun getSecondPassCode(): Boolean {
-        if (sharedPreferences != null) {
-            return sharedPreferences!!.getBoolean("secondPassCode", false)
-        }
-        return false
-    }
-
-
-    fun setSecondPassPin(value: String) {
-        sharedPreferences?.edit()?.putString("secondPassCodePin", value)?.apply()
-    }
-
-    fun getSecondPassPin(): String? {
-        if (sharedPreferences != null) {
-            return sharedPreferences!!.getString("secondPassCodePin", "")
-        }
-        return ""
-    }
-
-    fun isFirst(): Boolean {
-        val first = sharedPreferences!!.getBoolean("is_first", true)
-        if (first) {
-            val editor = sharedPreferences!!.edit()
-            editor.putBoolean("is_first", false)
-            editor.apply()
-        }
-        return first
+    fun getIsDuressPin(): Boolean {
+        return sharedPreferences!!.getBoolean("IS_DURESS_PIN", false)
     }
 
     fun getOvulationEnabled(): Boolean {
@@ -106,5 +134,8 @@ class SharedPrefs(context: Context?) {
         sharedPreferences?.edit()?.putBoolean("pms_enabled", enable)?.apply()
     }
 
+    fun isFirst(): Boolean{
+        return false
+    }
 
 }

@@ -1,17 +1,17 @@
 package com.digitalinterruption.lex.calender;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 public class EventObjects {
     private int id;
     private String message;
-    private Date date;
+    private LocalDateTime date;
     private int color;
-    public EventObjects(String message, Date date) {
+    public EventObjects(String message, LocalDateTime date) {
         this.message = message;
         this.date = date;
     }
-    public EventObjects(int id, String message, Date date) {
+    public EventObjects(int id, String message, LocalDateTime date) {
         this.date = date;
         this.message = message;
         this.id = id;
@@ -22,7 +22,7 @@ public class EventObjects {
     public String getMessage() {
         return message;
     }
-    public Date getDate() {
+    public LocalDateTime getDate() {
         return date;
     }
 

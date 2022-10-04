@@ -11,7 +11,7 @@ import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.digitalinterruption.lex.R
 import com.digitalinterruption.lex.models.SymptomModel
-import com.digitalinterruption.lex.ui.SymptomsFragment
+import com.digitalinterruption.lex.ui.main.SymptomsFragment
 
 class SymptomsAdapter(private val list: ArrayList<SymptomModel>, private val context: Context, val listener: MyItemSelected?) :
     RecyclerView.Adapter<SymptomsAdapter.MyViewHolder>() {

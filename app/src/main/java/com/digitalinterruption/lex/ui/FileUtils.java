@@ -39,16 +39,13 @@ public class FileUtils {
             return path;
         }
 
-        Log.d(TAG, "get path from uri: " + path);
         if (!isReadablePath(path)) {
             int index = path.lastIndexOf("/");
             String name = path.substring(index + 1);
             String dstPath = context.getCacheDir().getAbsolutePath() + File.separator + name;
             if (copyFile(context, uri, dstPath)) {
                 path = dstPath;
-                Log.d(TAG, "copy file success: " + path);
-            } else {
-                Log.d(TAG, "copy file fail!");
+
             }
         }
         return path;
@@ -59,7 +56,6 @@ public class FileUtils {
         if (isKitKat && DocumentsContract.isDocumentUri(context, uri)) {
             if (isExternalStorageDocument(uri)) {
                 final String docId = DocumentsContract.getDocumentId(uri);
-                Log.d("External Storage", docId);
                 final String[] split = docId.split(":");
                 final String type = split[0];
 

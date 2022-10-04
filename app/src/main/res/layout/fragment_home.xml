@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/green"
-    tools:context="com.digitalinterruption.lex.ui.HomeFragment">
+    tools:context="com.digitalinterruption.lex.ui.main.HomeFragment">
 
 
     <androidx.constraintlayout.widget.ConstraintLayout

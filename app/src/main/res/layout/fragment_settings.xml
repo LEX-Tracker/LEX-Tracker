@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/green"
-    tools:context="com.digitalinterruption.lex.ui.SettingsFragment">
+    tools:context="com.digitalinterruption.lex.ui.main.SettingsFragment">
 
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -217,15 +217,14 @@
 
 
                 </androidx.cardview.widget.CardView>
-
                 <EditText
-                    android:id="@+id/secondary_pin"
+                    android:id="@+id/primary_pin"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/_12sdp"
                     android:background="@drawable/bg_edit_text"
                     android:fontFamily="@font/arialnovabold"
-                    android:hint="Enter secondary pin"
+                    android:hint="Enter primary pin"
                     android:inputType="numberPassword"
                     android:maxLength="6"
                     android:maxLines="1"
@@ -235,6 +234,24 @@
                     app:layout_constraintEnd_toEndOf="@+id/import_layout"
                     app:layout_constraintStart_toStartOf="@+id/import_layout"
                     app:layout_constraintTop_toBottomOf="@id/import_layout" />
+
+                <EditText
+                    android:id="@+id/secondary_pin"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/_12sdp"
+                    android:background="@drawable/bg_edit_text"
+                    android:fontFamily="@font/arialnovabold"
+                    android:hint="Enter secondary pin (Duress)"
+                    android:inputType="numberPassword"
+                    android:maxLength="6"
+                    android:maxLines="1"
+                    android:paddingHorizontal="@dimen/_10sdp"
+                    android:paddingVertical="@dimen/_12sdp"
+                    android:textSize="@dimen/_12sdp"
+                    app:layout_constraintEnd_toEndOf="@+id/primary_pin"
+                    app:layout_constraintStart_toStartOf="@+id/primary_pin"
+                    app:layout_constraintTop_toBottomOf="@id/primary_pin" />
 
                 <EditText
                     android:id="@+id/et_nickname"

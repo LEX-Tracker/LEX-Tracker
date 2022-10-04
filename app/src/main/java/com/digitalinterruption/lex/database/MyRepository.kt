@@ -8,6 +8,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.launch
+import java.time.LocalDateTime
 
 class MyRepository(val myDao: MyDao) {
 
@@ -27,6 +28,7 @@ class MyRepository(val myDao: MyDao) {
 
     fun importData(columns: StringBuilder, values: StringBuilder){
         CoroutineScope(IO).launch {
+            // TODO rewrite this shite
             val query = SimpleSQLiteQuery("INSERT INTO sym_table ($columns) values($values)", arrayOf())
             try {
                 myDao.insertDataRawFormat(query)

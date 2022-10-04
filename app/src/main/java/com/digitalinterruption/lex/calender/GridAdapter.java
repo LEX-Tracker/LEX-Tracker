@@ -13,6 +13,7 @@ import androidx.annotation.Nullable;
 
 import com.digitalinterruption.lex.R;
 
+import java.time.ZoneOffset;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -58,6 +59,7 @@ public class GridAdapter extends ArrayAdapter {
             view.setBackgroundColor(Color.parseColor("#66F5F5F5"));
 //            view.setAlpha(0.4f);
         }
+
         //Add day to calendar
         TextView cellNumber = (TextView) view.findViewById(R.id.calendar_date_id);
         cellNumber.setText(String.valueOf(dayValue));
@@ -65,12 +67,15 @@ public class GridAdapter extends ArrayAdapter {
         TextView eventIndicator = (TextView) view.findViewById(R.id.event_id);
         Calendar eventCalendar = Calendar.getInstance();
         for (int i = 0; i < allEvents.size(); i++) {
-            eventCalendar.setTime(allEvents.get(i).getDate());
+            Date getDate = Date.from(allEvents.get(i).getDate().toInstant(ZoneOffset.UTC));
+
+
+            eventCalendar.setTime(getDate);
             if (dayValue == eventCalendar.get(Calendar.DAY_OF_MONTH) && displayMonth == eventCalendar.get(Calendar.MONTH) + 1) {
                 eventIndicator.setText(allEvents.get(i).getMessage());
                 view.setBackgroundColor((allEvents.get(i).getColor() != 0) ? allEvents.get(i).getColor() : Color.parseColor("#FF94B8"));
             }
-            //&& displayYear == eventCalendar.get(Calendar.YEAR)
+
         }
         return view;
     }

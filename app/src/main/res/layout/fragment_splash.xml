@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.digitalinterruption.lex.ui.SplashFragment">
+    tools:context="com.digitalinterruption.lex.ui.main.SplashFragment">
 
     <androidx.constraintlayout.utils.widget.ImageFilterView
         android:id="@+id/bg_img"

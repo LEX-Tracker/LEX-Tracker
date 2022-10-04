@@ -5,6 +5,7 @@ import androidx.room.*
 import androidx.sqlite.db.SimpleSQLiteQuery
 import androidx.sqlite.db.SupportSQLiteQuery
 import com.digitalinterruption.lex.models.SymptomModel
+import java.time.LocalDateTime
 
 @Dao
 interface MyDao {

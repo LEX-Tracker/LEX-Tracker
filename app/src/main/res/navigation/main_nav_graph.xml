@@ -7,25 +7,28 @@
 
     <fragment
         android:id="@+id/splashFragment"
-        android:name="com.digitalinterruption.lex.ui.SplashFragment"
+        android:name="com.digitalinterruption.lex.ui.main.SplashFragment"
         android:label="fragment_splash"
         tools:layout="@layout/fragment_splash" >
         <action
-            android:id="@+id/action_splashFragment_to_lockFragment"
-            app:destination="@id/lockFragment" />
+            android:id="@+id/action_splashFragment_to_PinFragment"
+            app:destination="@id/PinCodeFragment" />
+        <action
+            android:id="@+id/action_splashFragment_to_SettingsFragment"
+            app:destination="@id/settingsFragment" />
     </fragment>
     <fragment
-        android:id="@+id/lockFragment"
-        android:name="com.digitalinterruption.lex.ui.LockFragment"
-        android:label="fragment_lock"
-        tools:layout="@layout/fragment_lock" >
+        android:id="@+id/PinCodeFragment"
+        android:name="com.digitalinterruption.lex.ui.main.PinCodeFragment"
+        android:label="PinCodeFragment_lock"
+        tools:layout="@layout/fragment_pin_code" >
         <action
-            android:id="@+id/action_lockFragment_to_homeFragment"
+            android:id="@+id/action_PinFragment_to_homeFragment"
             app:destination="@id/homeFragment" />
     </fragment>
     <fragment
         android:id="@+id/homeFragment"
-        android:name="com.digitalinterruption.lex.ui.HomeFragment"
+        android:name="com.digitalinterruption.lex.ui.main.HomeFragment"
         android:label="fragment_home"
         tools:layout="@layout/fragment_home" >
         <action
@@ -41,7 +44,7 @@
     </fragment>
     <fragment
         android:id="@+id/symptomsFragment"
-        android:name="com.digitalinterruption.lex.ui.SymptomsFragment"
+        android:name="com.digitalinterruption.lex.ui.main.SymptomsFragment"
         android:label="fragment_symptoms"
         tools:layout="@layout/fragment_symptoms" >
         <action
@@ -53,11 +56,11 @@
         <argument
             android:name="date"
             app:argType="string"
-            android:defaultValue="0 0 0" />
+            android:defaultValue="01/01/1970 00:00" />
     </fragment>
     <fragment
         android:id="@+id/settingsFragment"
-        android:name="com.digitalinterruption.lex.ui.SettingsFragment"
+        android:name="com.digitalinterruption.lex.ui.main.SettingsFragment"
         android:label="fragment_settings"
         tools:layout="@layout/fragment_settings" >
         <action
