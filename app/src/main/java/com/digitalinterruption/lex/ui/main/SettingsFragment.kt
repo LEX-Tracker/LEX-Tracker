@@ -325,7 +325,7 @@ class SettingsFragment : Fragment() {
                             var _symptoms = SymptomModel(
                                     nextLine[0].toInt(), // id
                                     nextLine[1],         // date
-                                    nextLine[2],         // symptom
+                                    sanitiseText(nextLine[2]),         // symptom
                                     nextLine[3]          // intensity
                                 )
                             myViewModel.addData(arrayListOf(_symptoms))
@@ -344,6 +344,18 @@ class SettingsFragment : Fragment() {
 
     }
 
+    private fun sanitiseText (inputText: String): String{
+        // crude method of stripping dangerous characters from symptoms
+        var text = inputText
+        text = text.replace("[^\\x00-\\x7f]".toRegex(), "")
+        text = text.replace("[\\p{Cntrl}&&[^\r\n\t]]".toRegex(), "")
+        text = text.replace("\\p{C}".toRegex(), "")
+        text = text.replace("=","")
+        text = text.replace("+","")
+        text = text.replace("-","")
+        text = text.replace("@","")
+        return text
+    }
     private fun exportCSV(context: Context, uri: Uri?, password: String) {
         try {
             val dest = uri?.let { DocumentFile.fromTreeUri(context, it) }
@@ -398,74 +410,41 @@ class SettingsFragment : Fragment() {
     }
 
     private fun zipAndDelete(filePath: String, dest: DocumentFile?, password: String) {
-    /*
-        val dialogSetPassword = Dialog(requireContext())
-        dialogSetPassword.requestWindowFeature(Window.FEATURE_NO_TITLE)
-        dialogSetPassword.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-        dialogSetPassword.setContentView(R.layout.dialog_set_password)
-        dialogSetPassword.create()
-        dialogSetPassword.setCancelable(true)
-        val window: Window? = dialogSetPassword.window
-        window?.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT)
-        dialogSetPassword.show()
-
-        val btnOk: TextView = dialogSetPassword.findViewById(R.id.btnOk)
-        val btnCancel: TextView = dialogSetPassword.findViewById(R.id.btnCancel)
-        val editText: EditText = dialogSetPassword.findViewById(R.id.et_password)
-    */
-
         var file: File
 
+        val exportPath = dest?.uri?.path
 
-        //btnOk.setOnClickListener {
+        CoroutineScope(IO).launch {
+            val zipParameters = ZipParameters()
+            zipParameters.isEncryptFiles = true
+            zipParameters.encryptionMethod = EncryptionMethod.ZIP_STANDARD
+            zipParameters.aesKeyStrength = AesKeyStrength.KEY_STRENGTH_256
 
+            file = File(filePath)
+            val filesToAdd: List<File> = listOf(file)
 
-            val exportPath = dest?.uri?.path
-
-                CoroutineScope(IO).launch {
-                    val zipParameters = ZipParameters()
-                    zipParameters.isEncryptFiles = true
-                    zipParameters.encryptionMethod = EncryptionMethod.ZIP_STANDARD
-                    zipParameters.aesKeyStrength = AesKeyStrength.KEY_STRENGTH_256
-
-
-                    file = File(filePath)
-                    val filesToAdd: List<File> = listOf(file)
-
-                    //Create temp zip file using File
-                    val tmpOut = File(context?.cacheDir, "temp.zip")
+            //Create temp zip file using File
+            val tmpOut = File(context?.cacheDir, "temp.zip")
 
 
-                    val zipFile = ZipFile(tmpOut.canonicalPath, password.toCharArray())
-                    zipFile.addFiles(filesToAdd, zipParameters)
+            val zipFile = ZipFile(tmpOut.canonicalPath, password.toCharArray())
+            zipFile.addFiles(filesToAdd, zipParameters)
+            zipFile.close()
 
-                    zipFile.close()
+            copyToDocumentFile(tmpOut, dest)
 
-                    copyToDocumentFile(tmpOut, dest)
-
-                    withContext(Main) {
-                        Toast.makeText(
-                            requireContext(),
-                            "File is saved to $exportPath",
-                            Toast.LENGTH_LONG
-                        ).show()
-                        if (file.exists()) {
-                            file.delete()
-                        }
-
-                    }
+            withContext(Main) {
+                Toast.makeText(
+                    requireContext(),
+                    "File is saved to $exportPath",
+                    Toast.LENGTH_LONG
+                ).show()
+                if (file.exists()) {
+                    file.delete()
                 }
-            //} else {
-            //    Toast.makeText(requireContext(), "Minimum Password Length is 8 characters", Toast.LENGTH_SHORT).show()
-           // }
-            //dialogSetPassword.dismiss()
-        //}
 
-        //btnCancel.setOnClickListener {
-        //    dialogSetPassword.dismiss()
-        //}
-
-
+            }
+        }
     }
 
     private fun copyToDocumentFile(f : File?, df : DocumentFile?){

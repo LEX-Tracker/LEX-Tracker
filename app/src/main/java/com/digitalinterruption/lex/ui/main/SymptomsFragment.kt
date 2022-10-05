@@ -142,8 +142,6 @@ class SymptomsFragment : Fragment(), MyItemSelected {
             binding?.recyclerView?.adapter?.notifyDataSetChanged()
         }
 
-
-
         return binding!!.root
     }
 

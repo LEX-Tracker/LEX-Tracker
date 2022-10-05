@@ -41,11 +41,6 @@ class MyViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-     fun pushCustomerData(columns:StringBuilder,values:StringBuilder){
-        viewModelScope.launch {
-            repository.importData(columns, values)
-        }
-    }
 
 
 }

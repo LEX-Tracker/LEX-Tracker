@@ -26,16 +26,4 @@ class MyRepository(val myDao: MyDao) {
         }
     }
 
-    fun importData(columns: StringBuilder, values: StringBuilder){
-        CoroutineScope(IO).launch {
-            // TODO rewrite this shite
-            val query = SimpleSQLiteQuery("INSERT INTO sym_table ($columns) values($values)", arrayOf())
-            try {
-                myDao.insertDataRawFormat(query)
-            }catch (e: Exception){
-                Log.i("Logs", "pushCustomerData: ${e.message}")
-            }
-        }
-    }
-
 }
