@@ -224,11 +224,41 @@ class SettingsFragment : Fragment() {
             }
 
         } else if(requestCode == 200){
-            val dirUri = data?.data
-            exportCSV(requireContext(), dirUri)
+
+            val dialogSetPassword = Dialog(requireContext())
+            dialogSetPassword.requestWindowFeature(Window.FEATURE_NO_TITLE)
+            dialogSetPassword.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+            dialogSetPassword.setContentView(R.layout.dialog_set_password)
+            dialogSetPassword.create()
+            dialogSetPassword.setCancelable(true)
+            val window: Window? = dialogSetPassword.window
+            window?.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT)
+            dialogSetPassword.show()
+
+            val btnOk: TextView = dialogSetPassword.findViewById(R.id.btnOk)
+            val btnCancel: TextView = dialogSetPassword.findViewById(R.id.btnCancel)
+            val editText: EditText = dialogSetPassword.findViewById(R.id.et_password)
+
+
+            btnOk.setOnClickListener {
+            if (
+                editText.text.toString().trim() != "" &&
+                editText.text.length >= 8) {
+                val _password = editText.text.toString()
+                dialogSetPassword.dismiss()
+                val dirUri = data?.data
+                exportCSV(requireContext(), dirUri,_password)
+            } else {
+                    Toast.makeText(requireContext(), "Minimum Password Length is 8 characters", Toast.LENGTH_SHORT).show()
+                    dialogSetPassword.dismiss()
+                }
+            }
+
+            btnCancel.setOnClickListener {
+                dialogSetPassword.dismiss()
+            }
 
         }
-
     }
 
     private fun openAppSettings() {
@@ -314,7 +344,7 @@ class SettingsFragment : Fragment() {
 
     }
 
-    private fun exportCSV(context: Context, uri: Uri?) {
+    private fun exportCSV(context: Context, uri: Uri?, password: String) {
         try {
             val dest = uri?.let { DocumentFile.fromTreeUri(context, it) }
             var _file: DocumentFile? = null
@@ -329,8 +359,6 @@ class SettingsFragment : Fragment() {
 
             expDir = dest?.findFile("Exported")
 
-
-            //val _csv = File.createTempFile("temp", ".csv", context.cacheDir)
             val _csv = File(context.cacheDir,"Symptoms_${timeStamp}.csv")
 
             _csv.outputStream().use{
@@ -361,7 +389,7 @@ class SettingsFragment : Fragment() {
             curCSV.close()
 
 
-            dest?.let { zipAndDelete(_csv.absolutePath, _file) }
+            dest?.let { zipAndDelete(_csv.absolutePath, _file, password) }
 
         } catch (sqlEx: Exception) {
             Log.d("ERROR", sqlEx.toString())
@@ -369,8 +397,8 @@ class SettingsFragment : Fragment() {
 
     }
 
-    private fun zipAndDelete(filePath: String, dest: DocumentFile?) {
-
+    private fun zipAndDelete(filePath: String, dest: DocumentFile?, password: String) {
+    /*
         val dialogSetPassword = Dialog(requireContext())
         dialogSetPassword.requestWindowFeature(Window.FEATURE_NO_TITLE)
         dialogSetPassword.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
@@ -384,17 +412,16 @@ class SettingsFragment : Fragment() {
         val btnOk: TextView = dialogSetPassword.findViewById(R.id.btnOk)
         val btnCancel: TextView = dialogSetPassword.findViewById(R.id.btnCancel)
         val editText: EditText = dialogSetPassword.findViewById(R.id.et_password)
+    */
 
         var file: File
 
 
-        btnOk.setOnClickListener {
+        //btnOk.setOnClickListener {
 
 
             val exportPath = dest?.uri?.path
-            if (
-                editText.text.toString().trim() != "" &&
-                editText.text.length >= 8) {
+
                 CoroutineScope(IO).launch {
                     val zipParameters = ZipParameters()
                     zipParameters.isEncryptFiles = true
@@ -409,7 +436,7 @@ class SettingsFragment : Fragment() {
                     val tmpOut = File(context?.cacheDir, "temp.zip")
 
 
-                    val zipFile = ZipFile(tmpOut.canonicalPath, editText.text.toString().toCharArray())
+                    val zipFile = ZipFile(tmpOut.canonicalPath, password.toCharArray())
                     zipFile.addFiles(filesToAdd, zipParameters)
 
                     zipFile.close()
@@ -428,15 +455,15 @@ class SettingsFragment : Fragment() {
 
                     }
                 }
-            } else {
-                Toast.makeText(requireContext(), "Minimum Password Length is 8 characters", Toast.LENGTH_SHORT).show()
-            }
-            dialogSetPassword.dismiss()
-        }
+            //} else {
+            //    Toast.makeText(requireContext(), "Minimum Password Length is 8 characters", Toast.LENGTH_SHORT).show()
+           // }
+            //dialogSetPassword.dismiss()
+        //}
 
-        btnCancel.setOnClickListener {
-            dialogSetPassword.dismiss()
-        }
+        //btnCancel.setOnClickListener {
+        //    dialogSetPassword.dismiss()
+        //}
 
 
     }
