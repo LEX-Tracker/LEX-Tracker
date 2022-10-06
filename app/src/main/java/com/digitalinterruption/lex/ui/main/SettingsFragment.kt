@@ -157,20 +157,6 @@ class SettingsFragment : Fragment() {
         })
 
         binding?.btnSave?.setOnClickListener {
-
-            if(!binding?.primaryPin?.text.isNullOrEmpty() &&
-                binding?.primaryPin?.text?.length==6){
-                    binding?.primaryPin?.text?.toString()?.let { pin -> prefs.setPin(pin)
-                    }
-                binding?.primaryPin?.text?.clear()
-                Toast.makeText(context, "Primary Pin Successfully", Toast.LENGTH_LONG).show()
-
-            } else {
-                binding?.secondaryPin?.text?.clear()
-                Toast.makeText(context, "Enter 6 digit pin to continue", Toast.LENGTH_SHORT)
-                    .show()
-            }
-
             if (
                 !binding?.secondaryPin?.text.isNullOrEmpty() &&
                 binding?.secondaryPin?.text?.length == 6 &&
@@ -465,7 +451,6 @@ class SettingsFragment : Fragment() {
               f.delete()
             }
         }
-
 
     }
     private fun moveToNext(destination: String) {

@@ -1,60 +1,66 @@
 package com.digitalinterruption.lex.ui.main
 
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
+import android.os.CountDownTimer
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
 import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.ViewModelProviders
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.MutableLiveData
 import androidx.navigation.NavController
 import androidx.navigation.Navigation
 import androidx.navigation.fragment.findNavController
 import com.digitalinterruption.lex.R
 import com.digitalinterruption.lex.SharedPrefs
-import com.digitalinterruption.lex.databinding.FragmentSplashBinding
-import com.digitalinterruption.lex.helpers.EventObserver
+import com.digitalinterruption.lex.databinding.FragmentRegisterBinding
+import com.digitalinterruption.lex.models.MyViewModel
 
-class SplashFragment : Fragment() {
+class RegisterFragment : Fragment() {
 
-    private var _binding: FragmentSplashBinding? = null
-    private val binding get() = _binding!!
+    private var _binding: FragmentRegisterBinding? = null
+    private val binding get() = _binding
     private lateinit var callback: OnBackPressedCallback
+
+    var exit: Boolean = false
+    lateinit var countDown: CountDownTimer
     private lateinit var navController: NavController
     lateinit var prefs: SharedPrefs
-
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        _binding = FragmentSplashBinding.inflate(inflater, container, false)
+        _binding = FragmentRegisterBinding.inflate(inflater, container, false)
         prefs = SharedPrefs(requireContext())
-
-        return binding.root
+        return binding!!.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        var message: String
         super.onViewCreated(view, savedInstanceState)
         requireActivity().window.addFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS)
         navController = Navigation.findNavController(view)
 
-        fragmentBackPress()
-        Handler(Looper.getMainLooper()).postDelayed({
-            if (findNavController().currentDestination?.id == R.id.splashFragment) {
-                //check if pin is set
-                if (prefs.getIsPinSet()){
-                    findNavController().navigate(R.id.action_splashFragment_to_pinFragment)
-                } else {
-                    findNavController().navigate(R.id.action_splashFragment_to_RegisterFragment)
-                }
+        _binding?.btnSignUp?.setOnClickListener(){
+            val nickName = _binding?.etName?.text.toString()
+            val pinCode = binding?.etPassword?.text.toString()
 
+            if (!nickName.isNullOrEmpty()){
+                if (pinCode.isNullOrEmpty() || pinCode?.length!! < 6){
+                    message = "Please enter a 6 digit pin"
+                }else{
+                    prefs.setPin(pinCode)
+                    prefs.setNickName(nickName)
+                    findNavController().navigate(R.id.action_registerFragment_to_homeFragment)
+                }
+            }else{
+                message = "You must provide a nickname"
             }
-        }, 2000)
+        }
     }
 
     private fun fragmentBackPress() {
@@ -78,5 +84,4 @@ class SplashFragment : Fragment() {
             callback.remove()
         }
     }
-
 }

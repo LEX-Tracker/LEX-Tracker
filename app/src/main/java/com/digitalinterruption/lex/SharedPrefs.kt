@@ -94,6 +94,7 @@ class SharedPrefs(context: Context) {
 
         if (sharedPreferences != null){
             return LocalDateTime.parse(sharedPreferences.getString("LOCKOUT_UNTIL", "01/01/1970 00:00"),formatter)
+
         }
         return LocalDateTime.parse("01/01/1970 00:00", formatter)
     }
@@ -108,6 +109,17 @@ class SharedPrefs(context: Context) {
             return sharedPreferences!!.getString("passCodePin", "")
         }
         return ""
+    }
+
+    fun setNickName(value: String){
+        sharedPreferences?.edit()?.putString("Username", value)?.apply()
+    }
+
+    fun getNickName(): String? {
+        if (sharedPreferences != null){
+            return sharedPreferences!!.getString("Username", "Lex-User")
+        }
+        return "Lex-User"
     }
 
     fun setIsDuressPin(value: Boolean) {
