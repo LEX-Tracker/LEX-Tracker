@@ -129,19 +129,6 @@ class SettingsFragment : Fragment() {
             prefs.setPmsEnabled(b)
         }
 
-        binding?.primaryPin?.addTextChangedListener(object: TextWatcher {
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                binding?.btnSave?.isVisible = s.toString().trim() != ""
-            }
-
-            override fun afterTextChanged(s: Editable?) {
-
-            }
-
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
-
-            }
-        })
         binding?.secondaryPin?.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
 

@@ -7,6 +7,7 @@ import android.util.Log
 
 import androidx.lifecycle.*
 import androidx.navigation.NavController
+import androidx.navigation.fragment.findNavController
 import com.digitalinterruption.lex.R
 import com.digitalinterruption.lex.SharedPrefs
 import com.digitalinterruption.lex.helpers.Event
@@ -75,7 +76,6 @@ class PinCodeViewModel(val prefs: SharedPrefs) : ViewModel() {
                         // TODO: locked out bro!
                         message = "Max retries reached app locked until ${prefs.getLockOutDate()}"
                         Log.i("Locked Out!",message)
-
                     }else{
 
                     var incorrectAttempts = prefs.getIncorrectTries()
@@ -99,12 +99,10 @@ class PinCodeViewModel(val prefs: SharedPrefs) : ViewModel() {
             }
         }
 
-
         override fun onEraseClicked() {
             val droppedLast = pinCode.value?.dropLast(1) ?: ""
             pinCode.postValue(droppedLast)
         }
-
     }
 
 

@@ -9,15 +9,19 @@ import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.NavController
+import androidx.navigation.Navigation
 import com.digitalinterruption.lex.R
 import com.digitalinterruption.lex.SharedPrefs
 import com.digitalinterruption.lex.databinding.FragmentPinCodeBinding
+import com.digitalinterruption.lex.helpers.EventObserver
 
 class PinCodeFragment : Fragment(){
     lateinit var binding: FragmentPinCodeBinding
 
     private lateinit var viewModel: PinCodeViewModel
     private lateinit var callback: OnBackPressedCallback
+    private lateinit var navController: NavController
     var exit: Boolean = false
     lateinit var countDown: CountDownTimer
 
@@ -34,6 +38,14 @@ class PinCodeFragment : Fragment(){
         binding.viewModel = viewModel
 
         return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        navController = Navigation.findNavController(view)
+        viewModel.navigateScreen.observe(requireActivity(), EventObserver{
+            navController.navigate(it)
+        })
     }
 
     private fun fragmentBackPress(){
