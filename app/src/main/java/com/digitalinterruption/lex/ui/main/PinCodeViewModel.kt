@@ -41,7 +41,6 @@ class PinCodeViewModel(val prefs: SharedPrefs) : ViewModel() {
         }
     }
 
-    // TODO: get it to navigate to HomeFragment
     val numPadListener = object : NumPadListener {
         override fun onNumberClicked(number: Char) {
             val existingPinCode = pinCode.value ?: ""
@@ -55,25 +54,24 @@ class PinCodeViewModel(val prefs: SharedPrefs) : ViewModel() {
             if (newPassCode.length == 6) {
                 if (
                     prefs.getLockOutDate()?.isBefore(currentTimestamp)!!  &&
-                    prefs.getPin()  == newPassCode ||
-                    prefs.getDuressPin() == newPassCode) {
-                    if (prefs.getDuressPin() == newPassCode){
+                    prefs.getPin().equals(newPassCode) ||
+                    prefs.getDuressPin().equals(newPassCode)) {
+                    if (prefs.getDuressPin().equals(newPassCode)){
                         prefs.setIsDuressPin(true)
                         pinCode.postValue("")
+                        Log.i("PerSec","Duress")
+                        _navigateScreen.value = Event(R.id.action_PinFragment_to_homeFragment)
                     }else{
                         prefs.setIsDuressPin(false)
                         pinCode.postValue("")
                         prefs.setIncorrectTries(0)
+                        _navigateScreen.value = Event(R.id.action_PinFragment_to_homeFragment)
                     }
-                    // TODO: navigate to main
-                    _navigateScreen.value = Event(R.id.action_PinFragment_to_homeFragment)
-
-
 
                 } else{
                     pinCode.postValue("")
                     if (prefs.getLockOutDate()?.isAfter(currentTimestamp)!!){
-                        // TODO: locked out bro!
+
                         message = "Max retries reached app locked until ${prefs.getLockOutDate()}"
                         Log.i("Locked Out!",message)
                     }else{

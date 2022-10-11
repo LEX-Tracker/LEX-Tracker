@@ -41,9 +41,9 @@ class SymptomsFragment : Fragment(), MyItemSelected {
     private val listDb = arrayListOf<SymptomModel>()
 
     private val myViewModel: MyViewModel by viewModels()
-    val formatter: DateTimeFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")
+    private val formatter: DateTimeFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")
 
-    val defaultDate: LocalDateTime = LocalDateTime.parse("01/01/1970 00:00", formatter)
+    private val defaultDate: LocalDateTime = LocalDateTime.parse("01/01/1970 00:00", formatter)
 
     var date: LocalDateTime = defaultDate
     var dbDate: LocalDateTime = defaultDate
@@ -59,13 +59,6 @@ class SymptomsFragment : Fragment(), MyItemSelected {
         prefs = SharedPrefs(requireContext())
 
         val parsedDate: LocalDateTime = LocalDateTime.parse(args.date, formatter)
-
-        //TODO: whats this ?
-       /*if (!LockFragment.isSecondaryPin) {
-            date = parsedDate
-        } else {
-            date = "-1 -1 -1"
-        }*/
 
         date = parsedDate
 
@@ -149,7 +142,7 @@ class SymptomsFragment : Fragment(), MyItemSelected {
         super.onViewCreated(view, savedInstanceState)
         fragmentBackPress()
 
-        if (prefs.isFirst()) {
+        if (prefs.getIsPinSet()) {
             myViewModel.addData(listSymptoms)
         }
         binding?.ivHome?.setOnClickListener {
@@ -277,7 +270,7 @@ class SymptomsFragment : Fragment(), MyItemSelected {
     var myTag: Any = ""
 
     override fun myItemClicked(currentView: TextView, position: Int, list: ArrayList<SymptomModel>) {
-        // TODO: this needs refactoring too is more copy paste stuff
+        // TODO: this needs refactoring too, it's more copy paste stuff
         if (!date.isEqual(defaultDate)){
 
             if (currentView.tag != myTag) {

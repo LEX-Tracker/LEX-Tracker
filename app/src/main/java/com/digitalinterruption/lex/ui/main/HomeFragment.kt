@@ -69,6 +69,25 @@ class HomeFragment : Fragment(), CalendarView.OnDateChangeListener {
     val pms = R.color.pms
     val ov = R.color.ov
 
+    private fun getDuressData(_seedDate: LocalDateTime?): Collection<SymptomModel> {
+        val formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")
+        val seedDate = _seedDate?.minusDays(4)
+        val duressData: MutableList<SymptomModel> = arrayListOf()
+
+        duressData.add(0, SymptomModel(1, seedDate?.format(formatter),"Bleeding", "high"))
+
+        //ToDo: make this more robust
+        var i = 1
+        while (i < 20){
+            duressData.add(i,
+                SymptomModel(i, LocalDateTime.now().plusDays(i.toLong()).format(formatter), "", "low")
+            )
+            i +=1
+        }
+
+
+        return duressData
+    }
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -76,14 +95,20 @@ class HomeFragment : Fragment(), CalendarView.OnDateChangeListener {
         _binding = FragmentHomeBinding.inflate(inflater, container, false)
         prefs = SharedPrefs(requireContext())
 
-
-        myViewModel.readAllData.observe(viewLifecycleOwner) {
-            if (it.stream().anyMatch { it.date != "" }) {
-                listData.addAll(it)
+        if (!prefs.getIsDuressPin()){
+            myViewModel.readAllData.observe(viewLifecycleOwner) {
+                if (it.stream().anyMatch { it.date != "" }) {
+                    listData.addAll(it)
+                }
             }
+        }else{
+            // getDuressData generates fake data - probably a good idea to store it somewhere
+            // in case app needs opening multiple times it should look consistent
+            listData.addAll(getDuressData(LocalDateTime.now()))//duress data
         }
         return binding!!.root
     }
+
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -98,7 +123,7 @@ class HomeFragment : Fragment(), CalendarView.OnDateChangeListener {
         }
 
         binding?.calenderV?.setOnDateChangeListener(this)
-        // TODO: time stuff
+
         var calendar: Calendar = Calendar.getInstance()
         calendar.set(Calendar.DATE, calendar.getActualMaximum(Calendar.DATE))
         val endOfMonth: Long = calendar.timeInMillis
@@ -109,189 +134,105 @@ class HomeFragment : Fragment(), CalendarView.OnDateChangeListener {
         binding?.calenderV?.maxDate = endOfMonth
         binding?.calenderV?.minDate = startOfMonth
 
-        //new layout
-
-        //Custom Events
-
-
-
         CoroutineScope(IO).launch {
-            delay(1000)
-            if (args.fromWhichPin == "firstPin" && !LockFragment.isSecondaryPin) {
-                val eventObjectsToday = EventObjects(80, "Today", LocalDateTime.now())
-                eventObjectsToday.color = todayColor
-                mEvents.add(eventObjectsToday)
-                listData.forEach {
-                    if (it.date != "") {
+        delay(1000)
+        //ToDo: fix calendar - it currently clears when you move from the current month
+            // the events are passed in (if duress pin false data is generated and passed in instead)
+        val eventObjectsToday = EventObjects(80, "Today", LocalDateTime.now())
+        eventObjectsToday.color = todayColor
+        mEvents.add(eventObjectsToday)
+        listData.forEach {
+            if (it.date != "") {
 
-                        val date = LocalDateTime.parse(it.date)
-                        // TODO: refactor to use actual sensible LocalDateTime stuff
-                        if (oneTime) {
-                            startDay = date.dayOfMonth
-                            oneTime = false
-                        }
+                val date = LocalDateTime.parse(it.date, DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm"))
 
-                        if (startDay > date.dayOfMonth){
-                            startDay = date.dayOfMonth
-                        }
-
-                        if (it.intensity != "") {
-                            initialDate = date
-                            var eventObjects: EventObjects? = null
-                            if (date != lastDate) {
-                                eventObjects = EventObjects(it.id, "     ", date)
-                                if (it.symptom != "Bleeding") {
-                                    eventObjects.color = green
-                                } else {
-                                    eventObjects.color = yellow
-                                }
-                            }
-
-                            if (it.symptom == "Bleeding") {
-                                if (prefs.getOvulationEnabled()) {
-                                    populateOvEvents(mEvents, it)
-                                }
-                                if (prefs.getPmsEnabled()) {
-                                    populatePMSEvents(mEvents, it)
-                                }
-                            }
-
-                            if (eventObjects != null) {
-                                mEvents.add(eventObjects)
-                            }
-                        }
-                        lastDate = date
-                    }
+                if (oneTime) {
+                    startDay = date.dayOfMonth
+                    oneTime = false
                 }
 
-                withContext(Main) {
-                    binding?.progressBar?.isVisible = false
-                    binding?.layoutCalender?.removeAllViews()
-                    binding?.layoutCalender?.orientation = LinearLayout.VERTICAL
-
-                    val calendarCustomView = CalendarCustomView(requireContext(), mEvents)
-
-                    val layoutParams = LinearLayout.LayoutParams(
-                        LinearLayout.LayoutParams.MATCH_PARENT,
-                        LinearLayout.LayoutParams.MATCH_PARENT
-                    )
-                    calendarCustomView.layoutParams = layoutParams
-                    binding?.layoutCalender?.addView(calendarCustomView)
-
-
-
-                    calendarCustomView.calendarGridView.onItemClickListener =
-                        OnItemClickListener { adapterView, view, i, l ->
-
-                            if (adapterView.adapter.getView(l.toInt(), null, null).alpha == 0.4f) { //WHAT?
-                                Log.d("hello", "hello")
-                            } else {
-                                val today = Calendar.getInstance()
-                                today.time = Timestamp.valueOf(
-                                    LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
-                                        .toString())
-                                val tappedDay = Calendar.getInstance()
-                                tappedDay.time = Timestamp.valueOf(
-                                    LocalDateTime.ofInstant(
-                                        (adapterView.adapter.getItem(l.toInt()) as Date).toInstant(),
-                                        ZoneOffset.systemDefault()
-                                    ).format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
-                                        .toString()
-                                )
-                                    //adapterView.adapter.getItem(l.toInt()) as Date
-
-                                val action =
-                                    HomeFragmentDirections.actionHomeFragmentToSymptomsFragment(
-                                        LocalDateTime.ofInstant(
-                                            tappedDay.time.toInstant(),
-                                            ZoneOffset.systemDefault()
-                                        ).format(
-                                            DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")
-                                        ).toString()
-                                    )
-                                findNavController().navigate(action)
-
-                            }
-                        }
+                if (startDay > date.dayOfMonth){
+                    startDay = date.dayOfMonth
                 }
-            } else { // duress data
-                listData.forEach {
-                    val eventObjectsToday = EventObjects(80, "Today", LocalDateTime.now())
-                    eventObjectsToday.color = todayColor
-                    mEvents.add(eventObjectsToday)
-                    if (it.date != "") {
-                        val parsedDate = LocalDateTime.parse(it.date)
-                        if (oneTime) {
-                            startDay = parsedDate.dayOfMonth
-                            startMonth = parsedDate.monthValue
-                            oneTime = false
-                        }
 
-                        while (startMonth <= 12) {
-                            if (it.intensity != "") {
-                                val eventObjects = EventObjects(it.id, "     ", LocalDateTime.of(startDay, startMonth, MainActivity.year,0,0))
-
-                                if (it.symptom == "Bleeding") {
-                                    eventObjects.color = yellow
-                                } else {
-                                    eventObjects.color = green
-                                }
-                                mEvents.add(eventObjects)
-
-                                if (prefs.getOvulationEnabled()) {
-                                    populateOvEvents(mEvents, it)
-                                }
-
-                                if (prefs.getPmsEnabled()) {
-                                    populatePMSEvents(mEvents, it)
-                                }
-
-                            }
+                if (it.intensity != "") {
+                    initialDate = date
+                    var eventObjects: EventObjects? = null
+                    if (date != lastDate) {
+                        eventObjects = EventObjects(it.id, "     ", date)
+                        if (it.symptom != "Bleeding") {
+                            eventObjects.color = green
+                        } else {
+                            eventObjects.color = yellow
                         }
                     }
-                }
-                withContext(Main) {
-                    binding?.progressBar?.isVisible = false
-                    binding?.layoutCalender?.removeAllViews()
-                    binding?.layoutCalender?.orientation = LinearLayout.VERTICAL
 
-                    val calendarCustomView = CalendarCustomView(requireContext(), mEvents)
-                    val layoutParams = LinearLayout.LayoutParams(
-                        LinearLayout.LayoutParams.MATCH_PARENT,
-                        LinearLayout.LayoutParams.MATCH_PARENT
-                    )
-                    calendarCustomView.layoutParams = layoutParams
-                    binding?.layoutCalender?.addView(calendarCustomView)
-
-
-                    calendarCustomView.calendarGridView.onItemClickListener =
-                        OnItemClickListener { adapterView, view, i, l ->
-                            Log.i("TLogs", "onViewCreated: ${l} ${MainActivity.month}")
-                            if (adapterView.adapter.getView(l.toInt(), null, null).alpha == 0.4f) {
-                            } else {
-                                val today = Calendar.getInstance()
-                                today.time = Timestamp.valueOf(LocalDateTime.now().toString())
-                                val tappedDay = Calendar.getInstance()
-                                tappedDay.time = adapterView.adapter.getItem(l.toInt()) as Date
-                                val sameDay =
-                                  today[Calendar.DAY_OF_YEAR] == tappedDay[Calendar.DAY_OF_YEAR]
-                                if (today.after(tappedDay) && !sameDay) {
-                                    Toast.makeText(
-                                        requireContext(),
-                                        "You can't select previous date.",
-                                        Toast.LENGTH_LONG
-                                    ).show()
-                                    adapterView.adapter.getView(l.toInt(), null, null)
-
-                                } else {
-
-                                    val action =
-                                        HomeFragmentDirections.actionHomeFragmentToSymptomsFragment("${calendarCustomView.mAdapter.dateCal.get(Calendar.DAY_OF_MONTH)} ${MainActivity.month} ${MainActivity.year}")
-                                    findNavController().navigate(action)
-                                }
-                            }
+                    //ToDo: investigate why colours aren't being assigned correctly
+                    if (it.symptom == "Bleeding") {
+                        if (prefs.getOvulationEnabled()) {
+                            populateOvEvents(mEvents, it)
                         }
-                    //calendarCustomView.setRangesOfDate(makeDateRanges());
+                        if (prefs.getPmsEnabled()) {
+                            populatePMSEvents(mEvents, it)
+                        }
+                    }
+
+                    if (eventObjects != null) {
+                        mEvents.add(eventObjects)
+                    }
+                }
+                lastDate = date
+            }
+        }
+
+        withContext(Main) {
+            binding?.progressBar?.isVisible = false
+            binding?.layoutCalender?.removeAllViews()
+            binding?.layoutCalender?.orientation = LinearLayout.VERTICAL
+
+            val calendarCustomView = CalendarCustomView(requireContext(), mEvents)
+
+            val layoutParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.MATCH_PARENT
+            )
+            calendarCustomView.layoutParams = layoutParams
+            binding?.layoutCalender?.addView(calendarCustomView)
+
+
+
+            calendarCustomView.calendarGridView.onItemClickListener =
+                OnItemClickListener { adapterView, view, i, l ->
+
+                    if (adapterView.adapter.getView(l.toInt(), null, null).alpha == 0.4f) { //WHAT?
+                        Log.d("hello", "hello")
+                    } else {
+                        val today = Calendar.getInstance()
+                        today.time = Timestamp.valueOf(
+                            LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
+                                .toString())
+                        val tappedDay = Calendar.getInstance()
+                        tappedDay.time = Timestamp.valueOf(
+                            LocalDateTime.ofInstant(
+                                (adapterView.adapter.getItem(l.toInt()) as Date).toInstant(),
+                                ZoneOffset.systemDefault()
+                            ).format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
+                                .toString()
+                        )
+                            //adapterView.adapter.getItem(l.toInt()) as Date
+
+                        val action =
+                            HomeFragmentDirections.actionHomeFragmentToSymptomsFragment(
+                                LocalDateTime.ofInstant(
+                                    tappedDay.time.toInstant(),
+                                    ZoneOffset.systemDefault()
+                                ).format(
+                                    DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")
+                                ).toString()
+                            )
+                        findNavController().navigate(action)
+
+                    }
                 }
             }
 
@@ -420,7 +361,7 @@ class HomeFragment : Fragment(), CalendarView.OnDateChangeListener {
         var days = 13
         while (days < 19) {
 
-            val date = LocalDateTime.parse(symptom.date)
+            val date = LocalDateTime.parse(symptom.date, DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm"))
                 .plusDays(days.toLong())
                 .plusMonths(1)
             val event = EventObjects(
@@ -438,7 +379,7 @@ class HomeFragment : Fragment(), CalendarView.OnDateChangeListener {
     fun populatePMSEvents(mEvents: MutableList<EventObjects>, symptom: SymptomModel){
         var days = 6
         while (days > 0) {
-            val date = LocalDateTime.parse(symptom.date)
+            val date = LocalDateTime.parse(symptom.date, DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm"))
                 .plusDays(days.toLong())
                 .plusMonths(1)
             val event = EventObjects(

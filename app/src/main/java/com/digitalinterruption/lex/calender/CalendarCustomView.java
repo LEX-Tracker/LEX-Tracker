@@ -153,7 +153,7 @@ public class CalendarCustomView extends LinearLayout implements CalenderUtils {
 
     @Override
     public void nextMonth() {
-        //TODO: figure out what this shit is
+        //TODO: this needs to be redone as it currently does nothing
         cal.add(Calendar.MONTH, 1);
 
         MainActivity.Companion.setMonth(cal.getTime().getMonth() + 1);
@@ -161,25 +161,8 @@ public class CalendarCustomView extends LinearLayout implements CalenderUtils {
 
         ArrayList<EventObjects> list = (ArrayList<EventObjects>) Utils.Companion.changeEvents(context);
 
-
-        /*
-        if ((cal.getTime().getYear() + 1900) == HomeFragment.Companion.getMyYear()) {
-            for (int i = 0; i < list.size(); i++) {
-                if (list.get(i).getDate().getYear() != (cal.getTime().getYear())) {
-                    list.remove(i);
-                }
-            }
-
-            this.calendarEvents = list;
-
-            setUpCalendarAdapter(list);
-        } else {
-
-            this.calendarEvents.clear();
-            setUpCalendarAdapter((ArrayList<EventObjects>) calendarEvents);
-        }*/
-            this.calendarEvents.clear();
-            setUpCalendarAdapter((ArrayList<EventObjects>) calendarEvents);
+        this.calendarEvents.clear();
+        setUpCalendarAdapter((ArrayList<EventObjects>) calendarEvents);
 
     }
 

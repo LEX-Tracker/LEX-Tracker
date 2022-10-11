@@ -123,7 +123,7 @@ class SharedPrefs(context: Context) {
     }
 
     fun setIsDuressPin(value: Boolean) {
-        sharedPreferences?.edit()?.putBoolean("IS_DURESS_PIN", value)
+        sharedPreferences?.edit()?.putBoolean("IS_DURESS_PIN", value)?.apply()
     }
 
     fun getIsDuressPin(): Boolean {
@@ -144,10 +144,6 @@ class SharedPrefs(context: Context) {
 
     fun setPmsEnabled(enable: Boolean) {
         sharedPreferences?.edit()?.putBoolean("pms_enabled", enable)?.apply()
-    }
-
-    fun isFirst(): Boolean{
-        return false
     }
 
 }

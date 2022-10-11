@@ -109,13 +109,11 @@ class SettingsFragment : Fragment() {
         binding?.importLayout?.setOnClickListener {
             isExport = false
             if (checkPermission()) {
-                // TODO: this doesn't actually do anything
                 val intent = Intent()
                     .setType("*/*")
                     .setAction(Intent.ACTION_GET_CONTENT)
                 startActivityForResult(Intent.createChooser(intent, "Open CSV"), 100)
 
-                //importCSV()
             } else {
                 requestReadWritePermission()
             }
@@ -146,24 +144,25 @@ class SettingsFragment : Fragment() {
         binding?.btnSave?.setOnClickListener {
             if (
                 !binding?.secondaryPin?.text.isNullOrEmpty() &&
-                binding?.secondaryPin?.text?.length == 6 &&
-                binding?.secondaryPin?.text.toString().let { it1 -> checkPinCollision(it1) }
+                binding?.secondaryPin?.text?.length == 6
             ) {
-                prefs.setDuressPinEnabled(true)
-                binding?.secondaryPin?.text?.toString()?.let { pin -> prefs.setDuressPin(pin) }
-                binding?.secondaryPin?.text?.clear()
-                Toast.makeText(context, "Secondary Pin Successfully", Toast.LENGTH_SHORT).show()
-            }else {
-                if (binding?.secondaryPin?.text.toString().let { it1 -> checkPinCollision(it1) }) {
+                if (!binding?.secondaryPin?.text.toString().let {it1 -> checkPinCollision(it1)}){
+                    prefs.setDuressPinEnabled(true)
+                    binding?.secondaryPin?.text?.toString()?.let { pin -> prefs.setDuressPin(pin) }
+                    binding?.secondaryPin?.text?.clear()
+                    Toast.makeText(context, "Secondary Pin Successfully", Toast.LENGTH_SHORT).show()
+                }else{
                     Toast.makeText(context, "Duress pin and Primary pin cannot be the same!", Toast.LENGTH_SHORT)
                         .show()
-                }else {
+                }
+
+            }else {
                     Toast.makeText(context, "Enter 6 digit pin to continue", Toast.LENGTH_SHORT)
                     .show()
                 }
                 binding?.secondaryPin?.text?.clear()
-            }
         }
+
     }
 
 

@@ -47,7 +47,6 @@ class LockFragment : Fragment() {
 
     companion object {
         fun newInstance() = LockFragment()
-        var isSecondaryPin = false
     }
 
 }
