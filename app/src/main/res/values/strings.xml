@@ -6,6 +6,51 @@
     <string name="signInDesc">Enter your 6 digit pin to sign in</string>
     <string name="hello_blank_fragment">Hello blank fragment</string>
 
+    <string-array name="symptoms">
+        <item>Bleeding</item>
+        <item>Bloating</item>
+        <item>Cramping</item>
+        <item>Tender Breasts</item>
+        <item>Back Pain</item>
+        <item>Joint Pain</item>
+        <item>Muscle Pain</item>
+        <item>Muscle Tension</item>
+        <item>Vaginal Dryness</item>
+        <item>High Libido</item>
+        <item>Low Libido</item>
+        <item>Anxiety</item>
+        <item>Panic Attacks</item>
+        <item>Mood Swings</item>
+        <item>Irritability</item>
+        <item>Burning Tongue</item>
+        <item>Change in Taste</item>
+        <item>Dry Mouth</item>
+        <item>Dry Skin</item>
+        <item>Static Shocks</item>
+        <item>Hair Loss</item>
+        <item>Increased Allergies</item>
+        <item>Itchiness</item>
+        <item>Tingling</item>
+        <item>Heart Palpitations</item>
+        <item>Hot Feet</item>
+        <item>Cold Flash</item>
+        <item>Hot Flashes</item>
+        <item>Night Sweats</item>
+        <item>Insomnia</item>
+        <item>Disrupted Sleep</item>
+        <item>Fatigue</item>
+        <item>Headache</item>
+        <item>Migraine</item>
+        <item>Brain Fog</item>
+        <item>Buzzing Ears</item>
+        <item>Dizziness</item>
+        <item>Nausea</item>
+        <item>Diarrhoea</item>
+        <item>Constipation</item>
+        <item>Weight Gain</item>
+        <item>Weight Loss</item>
+    </string-array>
+
     <string name="current_date">June, 2016</string>
     <string name="add_event">ADD CALENDAR EVENT</string>
     <string name="sun">SUN</string>
