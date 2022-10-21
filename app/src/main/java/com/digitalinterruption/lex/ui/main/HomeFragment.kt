@@ -59,7 +59,7 @@ class HomeFragment : Fragment(), CalendarView.OnDateChangeListener {
     val args: HomeFragmentArgs by navArgs()
     val myViewModel: MyViewModel by viewModels()
     val mEvents: MutableList<EventObjects> = ArrayList<EventObjects>()
-    val formatter: DateTimeFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")
+    val defaultDateTimeFormat: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
 
     //Colours
 
@@ -70,17 +70,17 @@ class HomeFragment : Fragment(), CalendarView.OnDateChangeListener {
     val ov = R.color.ov
 
     private fun getDuressData(_seedDate: LocalDateTime?): Collection<SymptomModel> {
-        val formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")
+
         val seedDate = _seedDate?.minusDays(4)
         val duressData: MutableList<SymptomModel> = arrayListOf()
 
-        duressData.add(0, SymptomModel(1, seedDate?.format(formatter),"Bleeding", "high"))
+        duressData.add(0, SymptomModel(1, seedDate?.format(defaultDateTimeFormat),"Bleeding", "high"))
 
         //ToDo: make this more robust
         var i = 1
         while (i < 20){
             duressData.add(i,
-                SymptomModel(i, LocalDateTime.now().plusDays(i.toLong()).format(formatter), "", "low")
+                SymptomModel(i, LocalDateTime.now().plusDays(i.toLong()).format(defaultDateTimeFormat), "", "low")
             )
             i +=1
         }
@@ -144,7 +144,8 @@ class HomeFragment : Fragment(), CalendarView.OnDateChangeListener {
         listData.forEach {
             if (it.date != "") {
 
-                val date = LocalDateTime.parse(it.date, DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm"))
+
+                val date = LocalDateTime.parse(it.date, defaultDateTimeFormat) //this should be in the correct format anyway as we wrote it out in the correct format
 
                 if (oneTime) {
                     startDay = date.dayOfMonth
@@ -227,7 +228,7 @@ class HomeFragment : Fragment(), CalendarView.OnDateChangeListener {
                                     tappedDay.time.toInstant(),
                                     ZoneOffset.systemDefault()
                                 ).format(
-                                    DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")
+                                    DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
                                 ).toString()
                             )
                         findNavController().navigate(action)
@@ -361,7 +362,7 @@ class HomeFragment : Fragment(), CalendarView.OnDateChangeListener {
         var days = 13
         while (days < 19) {
 
-            val date = LocalDateTime.parse(symptom.date, DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm"))
+            val date = LocalDateTime.parse(symptom.date, defaultDateTimeFormat)
                 .plusDays(days.toLong())
                 .plusMonths(1)
             val event = EventObjects(
@@ -379,7 +380,7 @@ class HomeFragment : Fragment(), CalendarView.OnDateChangeListener {
     fun populatePMSEvents(mEvents: MutableList<EventObjects>, symptom: SymptomModel){
         var days = 6
         while (days > 0) {
-            val date = LocalDateTime.parse(symptom.date, DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm"))
+            val date = LocalDateTime.parse(symptom.date, defaultDateTimeFormat)
                 .plusDays(days.toLong())
                 .plusMonths(1)
             val event = EventObjects(

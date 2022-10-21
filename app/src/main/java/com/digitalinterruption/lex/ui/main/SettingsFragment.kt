@@ -60,6 +60,7 @@ class SettingsFragment : Fragment() {
     val myViewModel: MyViewModel by viewModels()
     var isExport: Boolean = false
     lateinit var prefs: SharedPrefs
+    private val defaultDateFormat: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
 
     private fun checkPinCollision(duressPin: String): Boolean {
         if (
@@ -296,7 +297,7 @@ class SettingsFragment : Fragment() {
                         nextLine?.let { nextLine ->
                             var _symptoms = SymptomModel(
                                     nextLine[0].toInt(), // id
-                                    nextLine[1],         // date
+                                    LocalDateTime.parse(nextLine[1]).format(defaultDateFormat),         // date
                                     sanitiseText(nextLine[2]),         // symptom
                                     nextLine[3]          // intensity
                                 )
