@@ -40,9 +40,9 @@ class SymptomsFragment : Fragment(), MyItemSelected {
     private val listDb = arrayListOf<SymptomModel>()
 
     private val myViewModel: MyViewModel by viewModels()
-    private val formatter: DateTimeFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")
+    private val defaultDateFormat: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
 
-    private val defaultDate: LocalDateTime = LocalDateTime.parse("01/01/1970 00:00", formatter)
+    private val defaultDate: LocalDateTime = LocalDateTime.parse("1970-01-01 00:00:00", defaultDateFormat)
 
     var date: LocalDateTime = defaultDate
     var dbDate: LocalDateTime = defaultDate
@@ -57,7 +57,7 @@ class SymptomsFragment : Fragment(), MyItemSelected {
         _binding = FragmentSymptomsBinding.inflate(inflater, container, false)
         prefs = SharedPrefs(requireContext())
 
-        val parsedDate: LocalDateTime = LocalDateTime.parse(args.date, formatter)
+        val parsedDate: LocalDateTime = LocalDateTime.parse(args.date, defaultDateFormat)
 
         val defaultSymptomsArray = resources.getStringArray(R.array.symptoms) //Gets list of default symptoms
 
@@ -65,11 +65,6 @@ class SymptomsFragment : Fragment(), MyItemSelected {
             listSymptoms.add(SymptomModel(i, "", defaultSymptomsArray[i-1], "")) //Adds them as a symptom
         }
 
-        for(i in 0 until defaultSymptomsArray.size - 1)
-            for(j in 0 until defaultSymptomsArray.size - 1)
-                if(listSymptoms[i].symptom == listSymptoms[j].symptom)
-                    if(listSymptoms[i].intensity != "") listSymptoms.removeAt(j)
-                    else listSymptoms.removeAt(i)
 
         myViewModel.readAllData.observe(viewLifecycleOwner) { data ->
             listDb.clear()
@@ -125,7 +120,7 @@ class SymptomsFragment : Fragment(), MyItemSelected {
                 binding?.progressBar?.isVisible = false
                 if (
                     !date.isEqual(
-                        LocalDateTime.parse("01/01/1970 00:00", formatter)
+                        LocalDateTime.parse("1970-01-01 00:00:00", defaultDateFormat)
                     )
                 ) {
                     if (date.isEqual(dbDate)) {
