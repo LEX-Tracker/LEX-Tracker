@@ -34,9 +34,9 @@ import kotlinx.coroutines.withContext
 import java.time.LocalDateTime
 import java.time.ZoneOffset
 import java.sql.Timestamp
+import java.time.Duration
 import java.util.*
 import java.time.format.DateTimeFormatter
-
 
 class HomeFragment : Fragment(), CalendarView.OnDateChangeListener {
     private var startMonth: Int = 0
@@ -55,6 +55,7 @@ class HomeFragment : Fragment(), CalendarView.OnDateChangeListener {
     var startDay: Int = 0
     var oneTime: Boolean = true
     var oneTimeEvent: Boolean = true
+    var bleedingDates = mutableListOf<LocalDateTime>()
 
     val args: HomeFragmentArgs by navArgs()
     val myViewModel: MyViewModel by viewModels()
@@ -144,7 +145,6 @@ class HomeFragment : Fragment(), CalendarView.OnDateChangeListener {
         listData.forEach {
             if (it.date != "") {
 
-
                 val date = LocalDateTime.parse(it.date, defaultDateTimeFormat) //this should be in the correct format anyway as we wrote it out in the correct format
 
                 if (oneTime) {
@@ -170,12 +170,7 @@ class HomeFragment : Fragment(), CalendarView.OnDateChangeListener {
 
                     //ToDo: investigate why colours aren't being assigned correctly
                     if (it.symptom == "Bleeding") {
-                        if (prefs.getOvulationEnabled()) {
-                            populateOvEvents(mEvents, it)
-                        }
-                        if (prefs.getPmsEnabled()) {
-                            populatePMSEvents(mEvents, it)
-                        }
+                        bleedingDates.add(date)
                     }
 
                     if (eventObjects != null) {
@@ -184,6 +179,14 @@ class HomeFragment : Fragment(), CalendarView.OnDateChangeListener {
                 }
                 lastDate = date
             }
+        }
+
+        if(prefs.getOvulationEnabled()){
+            populateOvEvents(bleedingDates, mEvents)
+        }
+
+        if(prefs.getPmsEnabled()){
+            populatePMSEvents(bleedingDates, mEvents)
         }
 
         withContext(Main) {
@@ -274,14 +277,7 @@ class HomeFragment : Fragment(), CalendarView.OnDateChangeListener {
                     }
 
                     if (it.symptom == "Bleeding") {
-
-                        if (prefs.getOvulationEnabled()) {
-                            populateOvEvents(mEvents, it)
-                        }
-
-                        if (prefs.getPmsEnabled()) {
-                            populatePMSEvents(mEvents, it)
-                        }
+                        bleedingDates.add(date)
                     }
 
                     if (eventObjects != null) {
@@ -291,6 +287,15 @@ class HomeFragment : Fragment(), CalendarView.OnDateChangeListener {
                 lastDate = date
             }
         }
+
+        if (prefs.getOvulationEnabled()) {
+            populateOvEvents(bleedingDates, mEvents)
+        }
+
+        if (prefs.getPmsEnabled()) {
+            populatePMSEvents(bleedingDates, mEvents)
+        }
+
         return mEvents
     }
 
@@ -358,39 +363,57 @@ class HomeFragment : Fragment(), CalendarView.OnDateChangeListener {
 
 
 
-    fun populateOvEvents(mEvents: MutableList<EventObjects>, symptom: SymptomModel){
-        var days = 13
-        while (days < 19) {
+    private fun populateOvEvents(bleedingDates: MutableList<LocalDateTime>, mEvents: MutableList<EventObjects>){
+        var daysTotal = 0
+        var avg = 0
 
-            val date = LocalDateTime.parse(symptom.date, defaultDateTimeFormat)
-                .plusDays(days.toLong())
-                .plusMonths(1)
-            val event = EventObjects(
-                symptom.id + 1,
-                "ov",
-                date
-            )
-            event.color = R.color.ov
-            mEvents.add(event)
-            days++
+        if(bleedingDates.size > 1){
+            for(i in 1..bleedingDates.size)
+                daysTotal += (Duration.between(bleedingDates[i], bleedingDates[i-1]).toDays()).toInt()
+            avg = daysTotal / bleedingDates.size
+            var lastPeriod = bleedingDates[-1]
+            var tillOv = avg - 13
+            var days = 0
+            while (days < 5) {
+
+                val date = lastPeriod
+                    .plusDays((days + tillOv).toLong())
+                val event = EventObjects(
+                    "ov",
+                    date
+                )
+                event.color = R.color.ov
+                mEvents.add(event)
+                days++
+            }
         }
+
 
     }
 
-    fun populatePMSEvents(mEvents: MutableList<EventObjects>, symptom: SymptomModel){
-        var days = 6
-        while (days > 0) {
-            val date = LocalDateTime.parse(symptom.date, defaultDateTimeFormat)
-                .plusDays(days.toLong())
-                .plusMonths(1)
-            val event = EventObjects(
-                symptom.id + 1,
-                "pms",
-                date
-            )
-            event.color = R.color.pms
-            mEvents.add(event)
-            days--
+    private fun populatePMSEvents(bleedingDates: MutableList<LocalDateTime>, mEvents: MutableList<EventObjects>){
+        var daysTotal = 0
+        var avg = 0
+
+        if(bleedingDates.size > 1){
+            for(i in 1..bleedingDates.size)
+                daysTotal += (Duration.between(bleedingDates[i], bleedingDates[i-1]).toDays()).toInt()
+            avg = daysTotal / bleedingDates.size
+            var lastPeriod = bleedingDates[-1]
+            var tillPms = avg - 5
+            var days = 0
+            while (days < 5) {
+
+                val date = lastPeriod
+                    .plusDays((days + tillPms).toLong())
+                val event = EventObjects(
+                    "pms",
+                    date
+                )
+                event.color = R.color.pms
+                mEvents.add(event)
+                days++
+            }
         }
 
     }
