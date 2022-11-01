@@ -23,11 +23,11 @@ public class GridAdapter extends ArrayAdapter {
     private LayoutInflater mInflater;
     private List<Date> monthlyDates;
     private Calendar currentDate;
-    private List<EventObjects> allEvents;
+    private List<EventObject> allEvents;
     CalendarCustomView calendarCustomView;
     public Calendar dateCal;
 
-    public GridAdapter(Context context, List<Date> monthlyDates, Calendar currentDate, List<EventObjects> allEvents) {
+    public GridAdapter(Context context, List<Date> monthlyDates, Calendar currentDate, List<EventObject> allEvents) {
         super(context, R.layout.single_cell_layout);
         this.monthlyDates = monthlyDates;
         this.currentDate = currentDate;
@@ -73,7 +73,9 @@ public class GridAdapter extends ArrayAdapter {
             eventCalendar.setTime(getDate);
             if (dayValue == eventCalendar.get(Calendar.DAY_OF_MONTH) && displayMonth == eventCalendar.get(Calendar.MONTH) + 1) {
                 eventIndicator.setText(allEvents.get(i).getMessage());
-                view.setBackgroundColor((allEvents.get(i).getColor() != 0) ? allEvents.get(i).getColor() : Color.parseColor("#FF94B8"));
+                view.setBackgroundColor(
+                    (allEvents.get(i).getColor() != 0) ? allEvents.get(i).getColor() : Color.parseColor("#FF94B8")
+                );
             }
 
         }
@@ -92,7 +94,7 @@ public class GridAdapter extends ArrayAdapter {
         return monthlyDates.get(position);
     }
 
-    public EventObjects getEvent(int position) {
+    public EventObject getEvent(int position) {
         return allEvents.get(position);
     }
 
