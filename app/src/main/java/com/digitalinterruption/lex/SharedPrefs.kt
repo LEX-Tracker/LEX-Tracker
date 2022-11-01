@@ -10,7 +10,7 @@ import java.time.format.DateTimeFormatter
 class SharedPrefs(context: Context) {
 
     var sharedPreferences = EncryptSharedPreferences.getInstance(context).sharedPreferences
-    val formatter: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
+    val formatter: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")
 
     companion object {
         lateinit var instance: SharedPrefs
@@ -93,10 +93,10 @@ class SharedPrefs(context: Context) {
     fun getLockOutDate(): LocalDateTime? {
 
         if (sharedPreferences != null){
-            return LocalDateTime.parse(sharedPreferences.getString("LOCKOUT_UNTIL", "1970-01-01 00:00:00"),formatter)
+            return LocalDateTime.parse(sharedPreferences.getString("LOCKOUT_UNTIL", "1970-01-01 00:00"), formatter)
 
         }
-        return LocalDateTime.parse("1970-01-01 00:00:00", formatter)
+        return LocalDateTime.parse("1970-01-01 00:00",formatter)
     }
 
     fun setPin(value: String) {
