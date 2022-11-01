@@ -102,8 +102,6 @@ class SymptomsAdapter(private val list: ArrayList<SymptomModel>, private val con
             }
         }
 
-
-
         holder.lowIntensity.setOnClickListener {
             oldLowView = holder.low
             oldMedView = holder.med

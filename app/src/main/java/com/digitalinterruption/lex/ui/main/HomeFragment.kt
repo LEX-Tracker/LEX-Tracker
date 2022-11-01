@@ -95,8 +95,9 @@ class HomeFragment : Fragment(), CalendarView.OnDateChangeListener {
         if (!prefs.getIsDuressPin()){
             myViewModel.readAllData.observe(viewLifecycleOwner) {
                 if (it.stream().anyMatch { it.date != "" }) {
-
                     Companion.listData.addAll(it)
+                }else{
+                    Log.d("populate", "symptom already in list:$it")
                 }
             }
         }else{
@@ -299,7 +300,6 @@ class HomeFragment : Fragment(), CalendarView.OnDateChangeListener {
                         }
                     }
                     countDown.start()
-
                 }
             }
         }
@@ -321,7 +321,6 @@ class HomeFragment : Fragment(), CalendarView.OnDateChangeListener {
 
     override fun onSelectedDayChange(p0: CalendarView, p1: Int, month: Int, date: Int) {
         val action = HomeFragmentDirections.actionHomeFragmentToSymptomsFragment("$date ${month + 1}")
-
     }
 
     fun populateOvEvents(mEvents: MutableList<EventObject>, symptom: SymptomModel){
@@ -330,13 +329,13 @@ class HomeFragment : Fragment(), CalendarView.OnDateChangeListener {
         while (days < 19) {
 
             val date = LocalDateTime.parse(symptom.date)
-                .plusDays(days.toLong())
+                .plusDays( -days.toLong())
                 .plusMonths(1)
             if (symptom.symptom == "Bleeding"){ //ToDo: workout how non-bleeding events ended up in here
                 mEvents.add(
                     EventObject(
                         symptom.id + 1,
-                        "" ,
+                        "ov" ,
                         date,
                         ov
                     )
@@ -349,10 +348,10 @@ class HomeFragment : Fragment(), CalendarView.OnDateChangeListener {
     }
 
     fun populatePMSEvents(mEvents: MutableList<EventObject>, symptom: SymptomModel){
-        var days = 6
+        var days = 5
         while (days > 0) {
             val date = LocalDateTime.parse(symptom.date)
-                .plusDays(days.toLong())
+                .plusDays(-days.toLong())
                 .plusMonths(1)
             if (symptom.symptom == "Bleeding"){
                 mEvents.add(

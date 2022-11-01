@@ -82,7 +82,6 @@ class SymptomsFragment : Fragment(), MyItemSelected {
 
 
         myViewModel.readAllData.observe(viewLifecycleOwner) { data ->
-            // Todo: refactor
             listDb.clear()
             data.forEach {
 
@@ -99,14 +98,13 @@ class SymptomsFragment : Fragment(), MyItemSelected {
                 if (it.intensity == "") {
                     listSymptomsData.add(it)
                 }
-            }
 
-            listSymptomsData.forEach { it1 ->
-                if (listDb.stream().anyMatch { it.symptom != it1.symptom }) {
-                    listDb.add(it1)
-                }
 
+            if (!listDb.contains(it)){
+                listDb.add(it)
             }
+        }
+
             binding?.recyclerView?.adapter?.notifyDataSetChanged()
         }
 
