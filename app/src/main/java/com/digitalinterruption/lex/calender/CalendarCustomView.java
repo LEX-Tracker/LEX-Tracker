@@ -178,7 +178,6 @@ public class CalendarCustomView extends LinearLayout implements CalenderUtils {
                 ZoneId.systemDefault()
         );
 
-
         MainActivity.Companion.setDate(
                 ldtCal.plusMonths(-1)
         );

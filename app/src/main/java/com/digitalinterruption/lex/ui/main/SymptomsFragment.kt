@@ -26,6 +26,7 @@ import com.digitalinterruption.lex.databinding.FragmentSymptomsBinding
 import com.digitalinterruption.lex.models.MyViewModel
 import com.digitalinterruption.lex.models.SymptomModel
 import kotlinx.coroutines.*
+import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
@@ -50,8 +51,20 @@ class SymptomsFragment : Fragment(), MyItemSelected {
     lateinit var prefs: SharedPrefs
 
     fun populateSymptoms(ldt: LocalDateTime){
-        Log.i("populate symptoms for date:", ldt.toString())
-
+        myViewModel.readAllData.observe(viewLifecycleOwner){data ->
+            data.forEach{
+                if (
+                    it.date != "" &&
+                    ldt.toLocalDate().equals(
+                        LocalDateTime.parse(it.date).toLocalDate()
+                    )
+                ){
+                    if(!listSymptomsSelected.contains(it)){
+                        listSymptomsSelected.add(it)
+                    }
+                }
+            }
+        }
     }
 
     override fun onCreateView(
@@ -61,7 +74,6 @@ class SymptomsFragment : Fragment(), MyItemSelected {
         _binding = FragmentSymptomsBinding.inflate(inflater, container, false)
         prefs = SharedPrefs(requireContext())
 
-        //val parsedDate: LocalDateTime = LocalDateTime.parse(args.date, defaultDateFormat)
         date = LocalDateTime.parse(args.date, defaultDateFormat)
         val defaultSymptomsArray = resources.getStringArray(R.array.symptoms) //Gets list of default symptoms
         for(i in 1..defaultSymptomsArray.size){

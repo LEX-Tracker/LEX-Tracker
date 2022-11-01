@@ -114,7 +114,6 @@ class HomeFragment : Fragment(), CalendarView.OnDateChangeListener {
         return binding!!.root
     }
 
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         fragmentBackPress()
@@ -139,27 +138,87 @@ class HomeFragment : Fragment(), CalendarView.OnDateChangeListener {
         binding?.calenderV?.maxDate = endOfMonth
         binding?.calenderV?.minDate = startOfMonth
 
-        val applContext = activity?.applicationContext!!
+        val appContext = activity?.applicationContext!!
 
         CoroutineScope(IO).launch {
         delay(1000)
         //ToDo: fix calendar - it currently clears when you move from the current month
-            // the events are passed in (if duress pin false data is generated and passed in instead)
+        // the events are passed in (if duress pin false data is generated and passed in instead)
+
+        addEvents(appContext)
+
+        withContext(Main) {
+            binding?.progressBar?.isVisible = false
+            binding?.layoutCalender?.removeAllViews()
+            binding?.layoutCalender?.orientation = LinearLayout.VERTICAL
+
+            val calendarCustomView = CalendarCustomView(requireContext(), mEvents)
+
+            val layoutParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.MATCH_PARENT
+            )
+
+            calendarCustomView.layoutParams = layoutParams
+            binding?.layoutCalender?.addView(calendarCustomView)
+
+            calendarCustomView.calendarGridView.onItemClickListener =
+                OnItemClickListener { adapterView, view, i, l ->
+
+                    if (adapterView.adapter.getView(l.toInt(), null, null).alpha == 0.4f) { //WHAT?
+                        Log.d("hello", "hello")
+                    } else {
+                        val today = Calendar.getInstance()
+                        today.time = Timestamp.valueOf(
+                            LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
+                                .toString())
+
+                        val tappedDay = Calendar.getInstance()
+                        tappedDay.time = Timestamp.valueOf(
+                            LocalDateTime.ofInstant(
+                                (adapterView.adapter.getItem(l.toInt()) as Date).toInstant(),
+                                ZoneOffset.systemDefault()
+                            ).format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
+                                .toString()
+                        )
+
+                        val action =
+                            HomeFragmentDirections.actionHomeFragmentToSymptomsFragment(
+                                LocalDateTime.ofInstant(
+                                    tappedDay.time.toInstant(),
+                                    ZoneOffset.systemDefault()
+                                ).format(
+                                    DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
+                                ).toString()
+                            )
+                        findNavController().navigate(action)
+
+                    }
+                }
+            }
+
+        }
+
+    }
+
+    fun addEvents(context: Context): MutableList<EventObject> {
+        mEvents.clear()
+        var prefs: SharedPrefs = SharedPrefs(context)
+        //colours
+        todayColor = ContextCompat.getColor(context,R.color.blue)
+        yellow = ContextCompat.getColor(context, R.color.darkYellow)
+        green = ContextCompat.getColor(context, R.color.green)
+        ov = ContextCompat.getColor(context, R.color.ov)
+        pms = ContextCompat.getColor(context, R.color.pms)
+
         val eventObjectToday = EventObject(
             80,
             "Today",
             LocalDateTime.now(),
-            ContextCompat.getColor(applContext,R.color.blue)
+            todayColor
         )
 
-        yellow = ContextCompat.getColor(applContext, R.color.darkYellow)
-        green = ContextCompat.getColor(applContext, R.color.green)
-        ov = ContextCompat.getColor(applContext, R.color.ov)
-        pms = ContextCompat.getColor(applContext, R.color.pms)
-
-
         mEvents.add(eventObjectToday)
-
 
         listData.forEach {
             if (it.date != "") {
@@ -203,104 +262,6 @@ class HomeFragment : Fragment(), CalendarView.OnDateChangeListener {
                 lastDate = date
             }
         }
-
-        withContext(Main) {
-            binding?.progressBar?.isVisible = false
-            binding?.layoutCalender?.removeAllViews()
-            binding?.layoutCalender?.orientation = LinearLayout.VERTICAL
-
-            val calendarCustomView = CalendarCustomView(requireContext(), mEvents)
-
-            val layoutParams = LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.MATCH_PARENT
-            )
-            calendarCustomView.layoutParams = layoutParams
-            binding?.layoutCalender?.addView(calendarCustomView)
-
-            calendarCustomView.calendarGridView.onItemClickListener =
-                OnItemClickListener { adapterView, view, i, l ->
-
-                    if (adapterView.adapter.getView(l.toInt(), null, null).alpha == 0.4f) { //WHAT?
-                        Log.d("hello", "hello")
-                    } else {
-                        val today = Calendar.getInstance()
-                        today.time = Timestamp.valueOf(
-                            LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
-                                .toString())
-                        val tappedDay = Calendar.getInstance()
-                        tappedDay.time = Timestamp.valueOf(
-                            LocalDateTime.ofInstant(
-                                (adapterView.adapter.getItem(l.toInt()) as Date).toInstant(),
-                                ZoneOffset.systemDefault()
-                            ).format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
-                                .toString()
-                        )
-
-                        val action =
-                            HomeFragmentDirections.actionHomeFragmentToSymptomsFragment(
-                                LocalDateTime.ofInstant(
-                                    tappedDay.time.toInstant(),
-                                    ZoneOffset.systemDefault()
-                                ).format(
-                                    DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
-                                ).toString()
-                            )
-                        findNavController().navigate(action)
-
-                    }
-                }
-            }
-
-        }
-
-    }
-
-    fun addEvents(context: Context): MutableList<EventObject> {
-        mEvents.clear()
-        var prefs: SharedPrefs = SharedPrefs(context)
-        val eventObjectToday = EventObject(
-            80,
-            "Today",
-            LocalDateTime.now(),
-            todayColor
-        )
-
-        mEvents.add(eventObjectToday)
-        listData.forEach {
-            if (it.date != "") {
-
-                val date = LocalDateTime.now() //get today's date
-                var eventObject: EventObject? = null
-
-                if (it.intensity !=""){
-                  eventObject = EventObject( // Create new event object
-                      it.id,
-                      "",
-                      LocalDateTime.parse(it.date)
-                  )
-                  eventObject.color = yellow
-
-                  if (it.symptom != "Bleeding"){
-                      eventObject.color = green
-
-                      if (prefs.getOvulationEnabled()) {
-                          populateOvEvents(mEvents, it)
-                      }
-
-                      if (prefs.getPmsEnabled()) {
-                          populatePMSEvents(mEvents, it)
-                      }
-                  }
-
-                    if (eventObject != null) {
-                        mEvents.add(eventObject)
-                    }
-                }
-                lastDate = date
-
-                }
-            }
         return mEvents
     }
 
@@ -347,7 +308,6 @@ class HomeFragment : Fragment(), CalendarView.OnDateChangeListener {
 
     override fun onDestroyView() {
         super.onDestroyView()
-//        requireActivity().window.clearFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS)
         _binding = null
     }
 
@@ -363,8 +323,6 @@ class HomeFragment : Fragment(), CalendarView.OnDateChangeListener {
         val action = HomeFragmentDirections.actionHomeFragmentToSymptomsFragment("$date ${month + 1}")
 
     }
-
-
 
     fun populateOvEvents(mEvents: MutableList<EventObject>, symptom: SymptomModel){
 
@@ -412,8 +370,6 @@ class HomeFragment : Fragment(), CalendarView.OnDateChangeListener {
     }
 
     companion object {
-        var myYear = 0
-        var myDate = LocalDateTime.now()
         var listData = arrayListOf<SymptomModel>()
     }
 
