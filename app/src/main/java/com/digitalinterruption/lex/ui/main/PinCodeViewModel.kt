@@ -32,14 +32,11 @@ class PinCodeViewModel(val prefs: SharedPrefs) : ViewModel() {
     val maxIncorrectAttempts = 5
     lateinit var context: Context
 
-    private val _snackboxMessage = MutableSharedFlow<String>()
-    val snackboxMessage = _snackboxMessage.asSharedFlow()
+    private val _snackboxMessage = MutableLiveData<Event<String>>()
+    val snackboxMessage: LiveData<Event<String>>
+        get() = _snackboxMessage
 
-    fun sendMessage(message: String) {
-        viewModelScope.launch {
-            _snackboxMessage.emit(message)
-        }
-    }
+
 
     val numPadListener = object : NumPadListener {
         override fun onNumberClicked(number: Char) {
@@ -47,7 +44,7 @@ class PinCodeViewModel(val prefs: SharedPrefs) : ViewModel() {
             val newPassCode = existingPinCode + number
             pinCode.postValue(newPassCode)
 
-            val formatter =  DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")
+            val formatter =  DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")
             val currentTimestamp =  LocalDateTime.now()
             var message: String
 
@@ -67,33 +64,42 @@ class PinCodeViewModel(val prefs: SharedPrefs) : ViewModel() {
                         prefs.setIncorrectTries(0)
                         _navigateScreen.value = Event(R.id.action_PinFragment_to_homeFragment)
                     }
-
                 } else{
                     pinCode.postValue("")
                     if (prefs.getLockOutDate()?.isAfter(currentTimestamp)!!){
+                        val unformatted = prefs.getLockOutDate()
+                        val formatted = unformatted?.format(
+                            DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm")
+                        )
 
-                        message = "Max retries reached app locked until ${prefs.getLockOutDate()}"
+                        message = "Max retries reached! App locked until $formatted"
+                        _snackboxMessage.value = Event(message)
                         Log.i("Locked Out!",message)
-                    }else{
-
+                    } else{
                     var incorrectAttempts = prefs.getIncorrectTries()
 
-                    if (incorrectAttempts < maxIncorrectAttempts){
+                    if (incorrectAttempts < maxIncorrectAttempts-1){
                         incorrectAttempts +=1
                         prefs.setIncorrectTries(incorrectAttempts)
                         message = "Incorrect Pin! ${maxIncorrectAttempts - incorrectAttempts } Attempt(s) Remaining!"
+                        _snackboxMessage.value = Event(message)
                         Log.i("Pin Entry", message)
                     } else {
                         val lockoutTimestamp = currentTimestamp.plusHours(12)
                         prefs.setLockOutDate(lockoutTimestamp.format(formatter))
                         prefs.setIsLockedOut(true)
 
-                        message = "Max retries reached! app locked until ${prefs.getLockOutDate()}"
+                        val unformatted = prefs.getLockOutDate()
+                        val formatted = unformatted?.format(
+                            DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm")
+                        )
+
+                        message = "Max retries reached! App locked until $formatted"
+                        _snackboxMessage.value = Event(message)
                         Log.i("Locked Out!",message)
                         }
                     }
                 }
-
             }
         }
 

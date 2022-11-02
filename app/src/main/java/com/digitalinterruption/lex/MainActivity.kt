@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.fragment.NavHostFragment
 import com.digitalinterruption.lex.databinding.ActivityMainBinding
 import java.text.SimpleDateFormat
+import java.time.LocalDateTime
 import java.util.*
 
 //@AndroidEntryPoint
@@ -23,5 +24,6 @@ class MainActivity : AppCompatActivity() {
     companion object {
         var month = 0
         var year = 0
+        var date: LocalDateTime = LocalDateTime.now()
     }
 }

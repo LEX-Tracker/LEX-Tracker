@@ -84,6 +84,9 @@ class SettingsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         fragmentBackPress()
+        if (!checkPermission()){
+            requestReadWritePermission()
+        }
 
         binding?.switchOwp?.isChecked = prefs.getOvulationEnabled()
         binding?.switchPms?.isChecked = prefs.getPmsEnabled()
@@ -114,7 +117,6 @@ class SettingsFragment : Fragment() {
                     .setType("*/*")
                     .setAction(Intent.ACTION_GET_CONTENT)
                 startActivityForResult(Intent.createChooser(intent, "Open CSV"), 100)
-
             } else {
                 requestReadWritePermission()
             }
