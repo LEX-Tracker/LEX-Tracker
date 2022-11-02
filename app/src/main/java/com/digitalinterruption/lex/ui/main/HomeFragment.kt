@@ -1,6 +1,7 @@
 package com.digitalinterruption.lex.ui.main
 
 import android.content.Context
+import android.graphics.Color
 import android.os.Bundle
 import android.os.CountDownTimer
 import android.util.Log
@@ -12,6 +13,7 @@ import android.widget.CalendarView
 import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
+import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -21,7 +23,7 @@ import com.digitalinterruption.lex.MainActivity
 import com.digitalinterruption.lex.R
 import com.digitalinterruption.lex.SharedPrefs
 import com.digitalinterruption.lex.calender.CalendarCustomView
-import com.digitalinterruption.lex.calender.EventObjects
+import com.digitalinterruption.lex.calender.EventObject
 import com.digitalinterruption.lex.databinding.FragmentHomeBinding
 import com.digitalinterruption.lex.models.MyViewModel
 import com.digitalinterruption.lex.models.SymptomModel
@@ -58,16 +60,16 @@ class HomeFragment : Fragment(), CalendarView.OnDateChangeListener {
 
     val args: HomeFragmentArgs by navArgs()
     val myViewModel: MyViewModel by viewModels()
-    val mEvents: MutableList<EventObjects> = ArrayList<EventObjects>()
+    val mEvents: MutableList<EventObject> = ArrayList<EventObject>()
     val defaultDateTimeFormat: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
 
     //Colours
-
-    val todayColor = R.color.blue
-    val yellow = R.color.darkYellow
-    val green = R.color.green
-    val pms = R.color.pms
-    val ov = R.color.ov
+    // initialse here but get correct values on view create
+    var todayColor = R.color.blue
+    var yellow = R.color.darkYellow
+    var green = R.color.green
+    var ov = R.color.ov
+    var pms = R.color.pms
 
     private fun getDuressData(_seedDate: LocalDateTime?): Collection<SymptomModel> {
 
@@ -88,6 +90,20 @@ class HomeFragment : Fragment(), CalendarView.OnDateChangeListener {
 
         return duressData
     }
+
+    fun populateEvents(listData: ArrayList<SymptomModel>, prefs: SharedPrefs){
+        if (!prefs.getIsDuressPin()){
+            myViewModel.readAllData.observe(viewLifecycleOwner) {
+                if (it.stream().anyMatch { it.date != "" }) {
+                    Companion.listData.addAll(it)
+                }else{
+                    Log.d("populate", "symptom already in list:$it")
+                }
+            }
+        }else{
+            listData.addAll(getDuressData(prefs.getDuressSeedDate()))
+        }
+    }
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -95,20 +111,9 @@ class HomeFragment : Fragment(), CalendarView.OnDateChangeListener {
         _binding = FragmentHomeBinding.inflate(inflater, container, false)
         prefs = SharedPrefs(requireContext())
 
-        if (!prefs.getIsDuressPin()){
-            myViewModel.readAllData.observe(viewLifecycleOwner) {
-                if (it.stream().anyMatch { it.date != "" }) {
-                    listData.addAll(it)
-                }
-            }
-        }else{
-            // getDuressData generates fake data - probably a good idea to store it somewhere
-            // in case app needs opening multiple times it should look consistent
-            listData.addAll(getDuressData(LocalDateTime.now()))//duress data
-        }
+        populateEvents(listData, prefs)
         return binding!!.root
     }
-
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -134,57 +139,14 @@ class HomeFragment : Fragment(), CalendarView.OnDateChangeListener {
         binding?.calenderV?.maxDate = endOfMonth
         binding?.calenderV?.minDate = startOfMonth
 
+        val appContext = activity?.applicationContext!!
+
         CoroutineScope(IO).launch {
         delay(1000)
         //ToDo: fix calendar - it currently clears when you move from the current month
-            // the events are passed in (if duress pin false data is generated and passed in instead)
-        val eventObjectsToday = EventObjects(80, "Today", LocalDateTime.now())
-        eventObjectsToday.color = todayColor
-        mEvents.add(eventObjectsToday)
-        listData.forEach {
-            if (it.date != "") {
+        // the events are passed in (if duress pin false data is generated and passed in instead)
 
-
-                val date = LocalDateTime.parse(it.date, defaultDateTimeFormat) //this should be in the correct format anyway as we wrote it out in the correct format
-
-                if (oneTime) {
-                    startDay = date.dayOfMonth
-                    oneTime = false
-                }
-
-                if (startDay > date.dayOfMonth){
-                    startDay = date.dayOfMonth
-                }
-
-                if (it.intensity != "") {
-                    initialDate = date
-                    var eventObjects: EventObjects? = null
-                    if (date != lastDate) {
-                        eventObjects = EventObjects(it.id, "     ", date)
-                        if (it.symptom != "Bleeding") {
-                            eventObjects.color = green
-                        } else {
-                            eventObjects.color = yellow
-                        }
-                    }
-
-                    //ToDo: investigate why colours aren't being assigned correctly
-                    if (it.symptom == "Bleeding") {
-                        if (prefs.getOvulationEnabled()) {
-                            populateOvEvents(mEvents, it)
-                        }
-                        if (prefs.getPmsEnabled()) {
-                            populatePMSEvents(mEvents, it)
-                        }
-                    }
-
-                    if (eventObjects != null) {
-                        mEvents.add(eventObjects)
-                    }
-                }
-                lastDate = date
-            }
-        }
+        addEvents(appContext)
 
         withContext(Main) {
             binding?.progressBar?.isVisible = false
@@ -197,10 +159,9 @@ class HomeFragment : Fragment(), CalendarView.OnDateChangeListener {
                 LinearLayout.LayoutParams.MATCH_PARENT,
                 LinearLayout.LayoutParams.MATCH_PARENT
             )
+
             calendarCustomView.layoutParams = layoutParams
             binding?.layoutCalender?.addView(calendarCustomView)
-
-
 
             calendarCustomView.calendarGridView.onItemClickListener =
                 OnItemClickListener { adapterView, view, i, l ->
@@ -212,6 +173,7 @@ class HomeFragment : Fragment(), CalendarView.OnDateChangeListener {
                         today.time = Timestamp.valueOf(
                             LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
                                 .toString())
+
                         val tappedDay = Calendar.getInstance()
                         tappedDay.time = Timestamp.valueOf(
                             LocalDateTime.ofInstant(
@@ -220,7 +182,6 @@ class HomeFragment : Fragment(), CalendarView.OnDateChangeListener {
                             ).format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
                                 .toString()
                         )
-                            //adapterView.adapter.getItem(l.toInt()) as Date
 
                         val action =
                             HomeFragmentDirections.actionHomeFragmentToSymptomsFragment(
@@ -241,16 +202,29 @@ class HomeFragment : Fragment(), CalendarView.OnDateChangeListener {
 
     }
 
-    fun addEvents(context: Context): MutableList<EventObjects> {
+    fun addEvents(context: Context): MutableList<EventObject> {
         mEvents.clear()
         var prefs: SharedPrefs = SharedPrefs(context)
-        val eventObjectsToday = EventObjects(80, "Today", LocalDateTime.now())
-        eventObjectsToday.color = todayColor
-        mEvents.add(eventObjectsToday)
+        //colours
+        todayColor = ContextCompat.getColor(context,R.color.blue)
+        yellow = ContextCompat.getColor(context, R.color.darkYellow)
+        green = ContextCompat.getColor(context, R.color.green)
+        ov = ContextCompat.getColor(context, R.color.ov)
+        pms = ContextCompat.getColor(context, R.color.pms)
+
+        val eventObjectToday = EventObject(
+            80,
+            "Today",
+            LocalDateTime.now(),
+            todayColor
+        )
+
+        mEvents.add(eventObjectToday)
+
         listData.forEach {
             if (it.date != "") {
+                val date = LocalDateTime.parse(it.date) //this should be in the correct format anyway as we wrote it out in the correct format
 
-                val date = LocalDateTime.now()
                 if (oneTime) {
                     startDay = date.dayOfMonth
                     oneTime = false
@@ -260,32 +234,30 @@ class HomeFragment : Fragment(), CalendarView.OnDateChangeListener {
                     startDay = date.dayOfMonth
                 }
 
-
                 if (it.intensity != "") {
                     initialDate = date
-                    var eventObjects: EventObjects? = null
+                    var eventObject: EventObject? = null
+
                     if (date != lastDate) {
-                        eventObjects = EventObjects(it.id, "     ", date)
+                        eventObject = EventObject(it.id, "     ", date, yellow)
                         if (it.symptom != "Bleeding") {
-                            eventObjects.color = green
+                            eventObject.color = green
                         } else {
-                            eventObjects.color = yellow
+                            eventObject.color = yellow
                         }
                     }
 
                     if (it.symptom == "Bleeding") {
-
                         if (prefs.getOvulationEnabled()) {
                             populateOvEvents(mEvents, it)
                         }
-
                         if (prefs.getPmsEnabled()) {
                             populatePMSEvents(mEvents, it)
                         }
                     }
 
-                    if (eventObjects != null) {
-                        mEvents.add(eventObjects)
+                    if (eventObject != null) {
+                        mEvents.add(eventObject)
                     }
                 }
                 lastDate = date
@@ -328,7 +300,6 @@ class HomeFragment : Fragment(), CalendarView.OnDateChangeListener {
                         }
                     }
                     countDown.start()
-
                 }
             }
         }
@@ -337,7 +308,6 @@ class HomeFragment : Fragment(), CalendarView.OnDateChangeListener {
 
     override fun onDestroyView() {
         super.onDestroyView()
-//        requireActivity().window.clearFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS)
         _binding = null
     }
 
@@ -350,53 +320,55 @@ class HomeFragment : Fragment(), CalendarView.OnDateChangeListener {
     }
 
     override fun onSelectedDayChange(p0: CalendarView, p1: Int, month: Int, date: Int) {
-
-
         val action = HomeFragmentDirections.actionHomeFragmentToSymptomsFragment("$date ${month + 1}")
-
     }
 
+    fun populateOvEvents(mEvents: MutableList<EventObject>, symptom: SymptomModel){
 
-
-    fun populateOvEvents(mEvents: MutableList<EventObjects>, symptom: SymptomModel){
         var days = 13
         while (days < 19) {
 
-            val date = LocalDateTime.parse(symptom.date, defaultDateTimeFormat)
-                .plusDays(days.toLong())
+            val date = LocalDateTime.parse(symptom.date)
+                .plusDays( -days.toLong())
                 .plusMonths(1)
-            val event = EventObjects(
-                symptom.id + 1,
-                "ov",
-                date
-            )
-            event.color = R.color.ov
-            mEvents.add(event)
+            if (symptom.symptom == "Bleeding"){ //ToDo: workout how non-bleeding events ended up in here
+                mEvents.add(
+                    EventObject(
+                        symptom.id + 1,
+                        "ov" ,
+                        date,
+                        ov
+                    )
+                )
+            }
             days++
+
         }
 
     }
 
-    fun populatePMSEvents(mEvents: MutableList<EventObjects>, symptom: SymptomModel){
-        var days = 6
+    fun populatePMSEvents(mEvents: MutableList<EventObject>, symptom: SymptomModel){
+        var days = 5
         while (days > 0) {
-            val date = LocalDateTime.parse(symptom.date, defaultDateTimeFormat)
-                .plusDays(days.toLong())
+            val date = LocalDateTime.parse(symptom.date)
+                .plusDays(-days.toLong())
                 .plusMonths(1)
-            val event = EventObjects(
-                symptom.id + 1,
-                "pms",
-                date
-            )
-            event.color = R.color.pms
-            mEvents.add(event)
+            if (symptom.symptom == "Bleeding"){
+                mEvents.add(
+                    EventObject(
+                        symptom.id + 1,
+                        "",
+                        date,
+                        pms
+                    )
+                )
+            }
             days--
         }
 
     }
 
     companion object {
-        var myYear = 0
         var listData = arrayListOf<SymptomModel>()
     }
 

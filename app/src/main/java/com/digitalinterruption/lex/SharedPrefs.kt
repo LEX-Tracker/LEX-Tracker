@@ -130,6 +130,18 @@ class SharedPrefs(context: Context) {
         return sharedPreferences!!.getBoolean("IS_DURESS_PIN", false)
     }
 
+    fun setDuressSeedDate(value: LocalDateTime){
+        sharedPreferences?.edit()?.putString("DURESS_DATE",
+            value.format(formatter)
+        )?.apply()
+    }
+
+    fun getDuressSeedDate(): LocalDateTime{
+        return LocalDateTime.parse(
+            sharedPreferences!!.getString("DURESS_DATE", "2022-01-01 00:00:00"), formatter
+        )
+    }
+
     fun getOvulationEnabled(): Boolean {
         return sharedPreferences!!.getBoolean("ov_enabled", true)
     }

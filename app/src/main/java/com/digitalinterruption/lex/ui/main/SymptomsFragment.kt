@@ -26,6 +26,7 @@ import com.digitalinterruption.lex.databinding.FragmentSymptomsBinding
 import com.digitalinterruption.lex.models.MyViewModel
 import com.digitalinterruption.lex.models.SymptomModel
 import kotlinx.coroutines.*
+import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
@@ -49,6 +50,22 @@ class SymptomsFragment : Fragment(), MyItemSelected {
     val args: SymptomsFragmentArgs by navArgs()
     lateinit var prefs: SharedPrefs
 
+    fun populateSymptoms(ldt: LocalDateTime){
+        myViewModel.readAllData.observe(viewLifecycleOwner){data ->
+            data.forEach{
+                if (
+                    it.date != "" &&
+                    ldt.toLocalDate().equals(
+                        LocalDateTime.parse(it.date).toLocalDate()
+                    )
+                ){
+                    if(!listSymptomsSelected.contains(it)){
+                        listSymptomsSelected.add(it)
+                    }
+                }
+            }
+        }
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -57,10 +74,8 @@ class SymptomsFragment : Fragment(), MyItemSelected {
         _binding = FragmentSymptomsBinding.inflate(inflater, container, false)
         prefs = SharedPrefs(requireContext())
 
-        val parsedDate: LocalDateTime = LocalDateTime.parse(args.date, defaultDateFormat)
-
+        date = LocalDateTime.parse(args.date, defaultDateFormat)
         val defaultSymptomsArray = resources.getStringArray(R.array.symptoms) //Gets list of default symptoms
-
         for(i in 1..defaultSymptomsArray.size){
             listSymptoms.add(SymptomModel(i, "", defaultSymptomsArray[i-1], "")) //Adds them as a symptom
         }
@@ -71,11 +86,9 @@ class SymptomsFragment : Fragment(), MyItemSelected {
             data.forEach {
 
                 var pDate: LocalDateTime = LocalDateTime.parse(defaultDate.toString())
-
                 if (!it.date.isNullOrEmpty()){
                     pDate = LocalDateTime.parse(it.date)
                 }
-
 
                 if (pDate.isEqual(date)) {
                     dbDate = pDate
@@ -85,13 +98,13 @@ class SymptomsFragment : Fragment(), MyItemSelected {
                 if (it.intensity == "") {
                     listSymptomsData.add(it)
                 }
-            }
-            listSymptomsData.forEach { it1 ->
-                if (listDb.stream().anyMatch { it.symptom != it1.symptom }) {
-                    listDb.add(it1)
-                }
 
+
+            if (!listDb.contains(it)){
+                listDb.add(it)
             }
+        }
+
             binding?.recyclerView?.adapter?.notifyDataSetChanged()
         }
 
@@ -136,6 +149,8 @@ class SymptomsFragment : Fragment(), MyItemSelected {
         }
 
         binding?.recyclerView?.layoutManager = LinearLayoutManager(requireContext(), RecyclerView.VERTICAL, false)
+
+        populateSymptoms(date)
 
         binding?.addNewSymptom?.setOnClickListener {
             val dialogSymptoms = Dialog(requireContext())
@@ -244,66 +259,46 @@ class SymptomsFragment : Fragment(), MyItemSelected {
                             else {
                                 try {
                                     if (listSymptomsSelected.size > 0) {
-
                                         if (listSymptomsSelected.stream().anyMatch { it.symptom == list[position].symptom }) {
-
                                             listSymptomsSelected[listSymptomsSelected.indexOf(list[position])] = SymptomModel(0, date.toString(), list[position].symptom, "low")
                                         } else {
                                             listSymptomsSelected.add(SymptomModel(listDb[position].id, date.toString(), list[position].symptom, "low"))
                                         }
-
-
                                     } else {
-
                                         listSymptomsSelected.add(SymptomModel(listDb[position].id, date.toString(), list[position].symptom, "low"))
                                     }
                                 } catch (e: Exception) {
                                 }
-
                             }
                         }
                          else {
                             try {
                                 if (listSymptomsSelected.size > 0) {
-
                                     if (listSymptomsSelected.stream().anyMatch { it.symptom == list[position].symptom }) {
-
                                         listSymptomsSelected[listSymptomsSelected.indexOf(list[position])] = SymptomModel(0, date.toString(), list[position].symptom, "low")
                                     } else {
                                         listSymptomsSelected.add(SymptomModel(0, date.toString(), list[position].symptom, "low"))
                                     }
-
-
                                 } else {
-
                                     listSymptomsSelected.add(SymptomModel(0, date.toString(), list[position].symptom, "low"))
                                 }
                             } catch (e: Exception) {
                             }
-
                         }
                     }
                     "med$position" -> {
                         if (listDb.size>0){
                             if (listDb[position].intensity != "") {
                                 listDb[position] = SymptomModel(listDb[position].id, date.toString(), list[position].symptom, "med")
-
                             } else {
-
                                 try {
                                     if (listSymptomsSelected.size > 0) {
-
                                         if (listSymptomsSelected.stream().anyMatch { it.symptom == list[position].symptom }) {
-
                                             listSymptomsSelected[listSymptomsSelected.indexOf(list[position])] = SymptomModel(0, date.toString(), list[position].symptom, "med")
                                         } else {
-
                                             listSymptomsSelected.add(SymptomModel(listDb[position].id, date.toString(), list[position].symptom, "med"))
                                         }
-
-
                                     } else {
-
                                         listSymptomsSelected.add(SymptomModel(listDb[position].id, date.toString(), list[position].symptom, "med"))
                                     }
                                 } catch (e: Exception) {
@@ -312,29 +307,20 @@ class SymptomsFragment : Fragment(), MyItemSelected {
                             }
                         }
                         else {
-
                             try {
                                 if (listSymptomsSelected.size > 0) {
-
                                     if (listSymptomsSelected.stream().anyMatch { it.symptom == list[position].symptom }) {
-
                                         listSymptomsSelected[listSymptomsSelected.indexOf(list[position])] = SymptomModel(0, date.toString(), list[position].symptom, "med")
                                     } else {
-
                                         listSymptomsSelected.add(SymptomModel(0, date.toString(), list[position].symptom, "med"))
                                     }
-
-
                                 } else {
-
                                     listSymptomsSelected.add(SymptomModel(0, date.toString(), list[position].symptom, "med"))
                                 }
                             } catch (e: Exception) {
 
                             }
                         }
-
-
                     }
                     else -> {
                         if(listDb.size > 0){
@@ -372,10 +358,7 @@ class SymptomsFragment : Fragment(), MyItemSelected {
                                     } else {
                                         listSymptomsSelected.add(SymptomModel(0, date.toString(), list[position].symptom, "high"))
                                     }
-
-
                                 } else {
-
                                     listSymptomsSelected.add(SymptomModel(0, date.toString(), list[position].symptom, "high"))
                                 }
                             } catch (e: Exception) {
@@ -393,20 +376,16 @@ class SymptomsFragment : Fragment(), MyItemSelected {
 
     override fun onPause() {
         if (!date.isEqual(defaultDate)) {
-
             if (listSymptomsSelected.size == 0) {
                 listDb.forEach { it1 ->
                     it1.intensity?.let { it1.date?.let { it2 -> it1.symptom?.let { it3 -> myViewModel.updateData(it, it2, it3) } } }
                 }
-
             } else {
                 myViewModel.addData(listSymptomsSelected)
             }
         }
-
         super.onPause()
     }
-
     companion object {
         val listSymptomsSelected = arrayListOf<SymptomModel>()
     }
