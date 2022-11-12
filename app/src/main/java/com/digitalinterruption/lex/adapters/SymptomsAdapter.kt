@@ -46,7 +46,9 @@ class SymptomsAdapter(private val list: ArrayList<SymptomModel>, private val con
 
         val yellow = R.color.darkYellow
         val green = R.color.green
-        var color = if (list[position].symptom == "Bleeding") {
+        var color = R.color.darkYellow
+
+        color = if (list[position].symptom == "Bleeding") {
             yellow
         } else {
             green
@@ -101,6 +103,8 @@ class SymptomsAdapter(private val list: ArrayList<SymptomModel>, private val con
                 holder.high.imageTintList = null
             }
         }
+
+
 
         holder.lowIntensity.setOnClickListener {
             oldLowView = holder.low

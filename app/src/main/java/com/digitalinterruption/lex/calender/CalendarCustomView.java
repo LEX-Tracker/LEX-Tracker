@@ -40,14 +40,14 @@ public class CalendarCustomView extends LinearLayout implements CalenderUtils {
     public Calendar cal = Calendar.getInstance(Locale.ENGLISH);
     private Context context;
     public GridAdapter mAdapter;
-    List<EventObject> calendarEvents = new ArrayList<>();
+    List<EventObjects> calendarEvents = new ArrayList<>();
 
-    public CalendarCustomView(Context context, List<EventObject> calendarEvents) {
+    public CalendarCustomView(Context context, List<EventObjects> calendarEvents) {
         super(context);
         this.calendarEvents = calendarEvents;
         this.context = context;
         initializeUILayout();
-        setUpCalendarAdapter((ArrayList<EventObject>) calendarEvents);
+        setUpCalendarAdapter((ArrayList<EventObjects>) calendarEvents);
         setPreviousButtonClickEvent();
         setNextButtonClickEvent();
         setGridCellClickEvents();
@@ -110,7 +110,7 @@ public class CalendarCustomView extends LinearLayout implements CalenderUtils {
                     @Override
                     public void onDateSet(DatePicker view, int year, int monthOfYear, final int dayOfMonth) {
                         cal.set(year, monthOfYear, dayOfMonth);
-                        setUpCalendarAdapter((ArrayList<EventObject>) calendarEvents);
+                        setUpCalendarAdapter((ArrayList<EventObjects>) calendarEvents);
                     }
                 }, currentDate.get(Calendar.YEAR), currentDate.get(Calendar.MONTH), currentDate.get(Calendar.DATE));
                 datePickerDialog.show();
@@ -125,24 +125,22 @@ public class CalendarCustomView extends LinearLayout implements CalenderUtils {
     }
 
 
-    public void setUpCalendarAdapter(ArrayList<EventObject> calendarEvents) {
+    public void setUpCalendarAdapter(ArrayList<EventObjects> calendarEvents) {
         List<Date> dayValueInCells = new ArrayList<Date>();
         Calendar mCal = (Calendar) cal.clone();
         mCal.set(Calendar.DAY_OF_MONTH, 1);
         int firstDayOfTheMonth = mCal.get(Calendar.DAY_OF_WEEK) - 1;
         mCal.add(Calendar.DAY_OF_MONTH, -firstDayOfTheMonth);
-
         while (dayValueInCells.size() < MAX_CALENDAR_COLUMN) {
             dayValueInCells.add(mCal.getTime());
             mCal.add(Calendar.DAY_OF_MONTH, 1);
         }
 
-        LocalDateTime sDate = LocalDateTime.ofInstant(
-                cal.getTime().toInstant(),
-                ZoneId.systemDefault()
-        );
+        LocalDateTime sDate = LocalDateTime.ofInstant(cal.getTime().toInstant(), ZoneId.systemDefault());
 
-        MainActivity.Companion.setDate(sDate);
+        MainActivity.Companion.setMonth(cal.getTime().getMonth() + 1);
+        MainActivity.Companion.setYear(cal.getTime().getYear() + 1900);
+
 
         currentDate.setText(
                 sDate.format(
@@ -156,54 +154,72 @@ public class CalendarCustomView extends LinearLayout implements CalenderUtils {
     @Override
     public void nextMonth() {
         //TODO: this needs to be redone as it currently does nothing
-        LocalDateTime ldtCal = LocalDateTime.ofInstant(cal.toInstant(), ZoneId.systemDefault());
-
-        MainActivity.Companion.setDate(
-                ldtCal.plusMonths(1)
-        );
         cal.add(Calendar.MONTH, 1);
 
-        ArrayList<EventObject> list = (ArrayList<EventObject>) Utils.Companion.changeEvents(context);
+        MainActivity.Companion.setMonth(cal.getTime().getMonth() + 1);
+        MainActivity.Companion.setYear(cal.getTime().getYear() + 1900);
+
+        ArrayList<EventObjects> list = (ArrayList<EventObjects>) Utils.Companion.changeEvents(context);
 
         this.calendarEvents.clear();
-        this.calendarEvents = list;
-        setUpCalendarAdapter((ArrayList<EventObject>) calendarEvents);
+        setUpCalendarAdapter((ArrayList<EventObjects>) calendarEvents);
 
     }
 
     @Override
     public void previousMonths() {
-        LocalDateTime ldtCal = LocalDateTime.ofInstant(
-                cal.toInstant(),
-                ZoneId.systemDefault()
-        );
-
-        MainActivity.Companion.setDate(
-                ldtCal.plusMonths(-1)
-        );
         cal.add(Calendar.MONTH, -1);
+        MainActivity.Companion.setMonth(cal.getTime().getMonth() + 1);
+        MainActivity.Companion.setYear(cal.getTime().getYear() + 1900);
 
-        ArrayList<EventObject> list = (ArrayList<EventObject>) Utils.Companion.changeEvents(context);
+        ArrayList<EventObjects> list = (ArrayList<EventObjects>) Utils.Companion.changeEvents(context);
+        /* this will never get hit as getMyYear always returns 0?
 
+        if ((cal.getTime().getYear() + 1900) == HomeFragment.Companion.getMyYear()) {
+            for (int i = 0; i < list.size(); i++) {
+                if (list.get(i).getDate().getYear() != (cal.getTime().getYear())) {
+                    list.remove(i);
+                }
+            }
+            Log.i(TAG, "nextMonth3: " + list.size());
+            this.calendarEvents = list;
+
+            setUpCalendarAdapter(list);
+        } else {
+            this.calendarEvents.clear();
+            setUpCalendarAdapter((ArrayList<EventObjects>) calendarEvents);
+        }*/
          this.calendarEvents.clear();
-         this.calendarEvents = list;
-         setUpCalendarAdapter((ArrayList<EventObject>) calendarEvents);
+         setUpCalendarAdapter((ArrayList<EventObjects>) calendarEvents);
     }
 
+    public void moveMonth(boolean moveForward){
+        if (moveForward){
+            cal.add(Calendar.MONTH, -1);
+        }else{
+            cal.add(Calendar.MONTH, 1);
+        }
 
+        MainActivity.Companion.setMonth(cal.getTime().getMonth()+1);
+        MainActivity.Companion.setYear(cal.getTime().getYear()+1900);
 
-    public void setSelectedDates(EventObject calendarEvents) {
+        ArrayList<EventObjects> list = (ArrayList<EventObjects>) Utils.Companion.changeEvents(context);
+        this.calendarEvents.clear();
+        setUpCalendarAdapter((ArrayList<EventObjects>) calendarEvents);
+    }
+
+    public void setSelectedDates(EventObjects calendarEvents) {
         this.calendarEvents.add(calendarEvents);
         mAdapter.notifyDataSetChanged();
     }
 
-    public void setRangesOfDate(List<EventObject> calendarEvents) {
+    public void setRangesOfDate(List<EventObjects> calendarEvents) {
         this.calendarEvents = calendarEvents;
-        setUpCalendarAdapter((ArrayList<EventObject>) calendarEvents);
+        setUpCalendarAdapter((ArrayList<EventObjects>) calendarEvents);
         mAdapter.notifyDataSetChanged();
     }
 
-    public void removeSelectedDate(EventObject calendarEvents) {
+    public void removeSelectedDate(EventObjects calendarEvents) {
         for (int i = 0; i < this.calendarEvents.size(); i++) {
             if (this.calendarEvents.get(i).getDate().toString().equals(calendarEvents.getDate().toString())) {
                 this.calendarEvents.remove(i);
