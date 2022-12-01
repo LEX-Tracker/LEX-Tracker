@@ -50,6 +50,7 @@ dependencies {
     implementation 'com.google.android.material:material:1.6.1'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
     implementation 'com.opencsv:opencsv:5.6'
+    implementation 'androidx.sqlite:sqlite:2.1.0'
 
 
     //sdp screen size

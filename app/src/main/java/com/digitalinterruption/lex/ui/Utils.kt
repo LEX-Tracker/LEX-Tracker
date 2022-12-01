@@ -6,7 +6,7 @@ import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Environment
 import androidx.core.content.ContextCompat
-import com.digitalinterruption.lex.calender.EventObjects
+import com.digitalinterruption.lex.calender.EventObject
 import com.digitalinterruption.lex.ui.main.HomeFragment
 
 class Utils {
@@ -35,7 +35,7 @@ class Utils {
 
         }
 
-        fun changeEvents(context: Context): MutableList<EventObjects> {
+        fun changeEvents(context: Context): MutableList<EventObject> {
             return HomeFragment().addEvents(context)
         }
     }
