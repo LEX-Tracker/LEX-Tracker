@@ -44,7 +44,7 @@ class PinCodeViewModel(val prefs: SharedPrefs) : ViewModel() {
             val newPassCode = existingPinCode + number
             pinCode.postValue(newPassCode)
 
-            val formatter =  DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")
+            val formatter =  DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
             val currentTimestamp =  LocalDateTime.now()
             var message: String
 
@@ -56,7 +56,6 @@ class PinCodeViewModel(val prefs: SharedPrefs) : ViewModel() {
                     if (prefs.getDuressPin().equals(newPassCode)){
                         prefs.setIsDuressPin(true)
                         pinCode.postValue("")
-                        Log.i("PerSec","Duress")
                         _navigateScreen.value = Event(R.id.action_PinFragment_to_homeFragment)
                     }else{
                         prefs.setIsDuressPin(false)

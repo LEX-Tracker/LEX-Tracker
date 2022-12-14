@@ -10,7 +10,7 @@ import java.time.format.DateTimeFormatter
 class SharedPrefs(context: Context) {
 
     var sharedPreferences = EncryptSharedPreferences.getInstance(context).sharedPreferences
-    val formatter: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")
+    val formatter: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
 
     companion object {
         lateinit var instance: SharedPrefs
