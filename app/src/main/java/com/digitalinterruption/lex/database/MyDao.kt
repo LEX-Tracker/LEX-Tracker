@@ -21,9 +21,4 @@ interface MyDao {
     @Query("SELECT * from sym_table")
     fun getAllData(): LiveData<List<SymptomModel>>
 
-    @RawQuery
-    fun insertDataRawFormat(query: SupportSQLiteQuery): Boolean?
-
-
-
 }

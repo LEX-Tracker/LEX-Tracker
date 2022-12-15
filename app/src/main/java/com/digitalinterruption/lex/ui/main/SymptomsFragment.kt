@@ -242,134 +242,79 @@ class SymptomsFragment : Fragment(), MyItemSelected {
 
     var myTag: Any = ""
 
+    fun populateSelectedSymptoms(sym_id: Int,
+                                 date: LocalDateTime,
+                                 list:  ArrayList<SymptomModel>,
+                                 position: Int,
+                                 intensity: String
+    ) {
+        if (listSymptomsSelected.size > 0) {
+            if (listSymptomsSelected.stream().anyMatch { it.symptom == list[position].symptom }) {
+                listSymptomsSelected[listSymptomsSelected.indexOf(list[position])] = SymptomModel(0, date.format(defaultDateFormat), list[position].symptom, intensity)
+            } else {
+                listSymptomsSelected.add(SymptomModel(sym_id, date.format(defaultDateFormat), list[position].symptom, intensity))
+            }
+        } else {
+            listSymptomsSelected.add(SymptomModel(sym_id, date.format(defaultDateFormat), list[position].symptom, intensity))
+        }
+
+    }
+
+    fun setItemClicked(intensity: String, position: Int, list: ArrayList<SymptomModel>){
+
+        var sym_int = 0
+
+        if (listDb.size > 0){
+            sym_int = listDb[position].id
+            if (listDb[position].intensity !="") {
+                listDb[position] = SymptomModel(
+                    sym_int,
+                    date.toString(),
+                    list[position].symptom,
+                    intensity
+                )
+            } else {
+                try {
+                    populateSelectedSymptoms(
+                        sym_int,
+                        date,
+                        list,
+                        position,
+                        intensity
+                    )
+
+                }catch (e: Exception){
+
+                }
+            }
+        }else{
+            populateSelectedSymptoms(
+                sym_int,
+                date,
+                list,
+                position,
+                intensity
+            )
+        }
+    }
     override fun myItemClicked(currentView: TextView, position: Int, list: ArrayList<SymptomModel>) {
-        // TODO: this needs refactoring too, it's more copy paste stuff
         if (!date.isEqual(defaultDate)){
 
             if (currentView.tag != myTag) {
                 when (currentView.tag) {
-
                     "low$position" -> {
-                        if (listDb.size > 0){
-                            if (listDb[position].intensity != "") {
-                                listDb[position] = SymptomModel(listDb[position].id, date.toString(), list[position].symptom, "low")
-                            }
-                            else {
-                                try {
-                                    if (listSymptomsSelected.size > 0) {
-                                        if (listSymptomsSelected.stream().anyMatch { it.symptom == list[position].symptom }) {
-                                            listSymptomsSelected[listSymptomsSelected.indexOf(list[position])] = SymptomModel(0, date.toString(), list[position].symptom, "low")
-                                        } else {
-                                            listSymptomsSelected.add(SymptomModel(listDb[position].id, date.toString(), list[position].symptom, "low"))
-                                        }
-                                    } else {
-                                        listSymptomsSelected.add(SymptomModel(listDb[position].id, date.toString(), list[position].symptom, "low"))
-                                    }
-                                } catch (e: Exception) {
-                                }
-                            }
-                        }
-                         else {
-                            try {
-                                if (listSymptomsSelected.size > 0) {
-                                    if (listSymptomsSelected.stream().anyMatch { it.symptom == list[position].symptom }) {
-                                        listSymptomsSelected[listSymptomsSelected.indexOf(list[position])] = SymptomModel(0, date.toString(), list[position].symptom, "low")
-                                    } else {
-                                        listSymptomsSelected.add(SymptomModel(0, date.toString(), list[position].symptom, "low"))
-                                    }
-                                } else {
-                                    listSymptomsSelected.add(SymptomModel(0, date.toString(), list[position].symptom, "low"))
-                                }
-                            } catch (e: Exception) {
-                            }
-                        }
+                        setItemClicked("low", position, list)
                     }
                     "med$position" -> {
-                        if (listDb.size>0){
-                            if (listDb[position].intensity != "") {
-                                listDb[position] = SymptomModel(listDb[position].id, date.toString(), list[position].symptom, "med")
-                            } else {
-                                try {
-                                    if (listSymptomsSelected.size > 0) {
-                                        if (listSymptomsSelected.stream().anyMatch { it.symptom == list[position].symptom }) {
-                                            listSymptomsSelected[listSymptomsSelected.indexOf(list[position])] = SymptomModel(0, date.toString(), list[position].symptom, "med")
-                                        } else {
-                                            listSymptomsSelected.add(SymptomModel(listDb[position].id, date.toString(), list[position].symptom, "med"))
-                                        }
-                                    } else {
-                                        listSymptomsSelected.add(SymptomModel(listDb[position].id, date.toString(), list[position].symptom, "med"))
-                                    }
-                                } catch (e: Exception) {
-
-                                }
-                            }
-                        }
-                        else {
-                            try {
-                                if (listSymptomsSelected.size > 0) {
-                                    if (listSymptomsSelected.stream().anyMatch { it.symptom == list[position].symptom }) {
-                                        listSymptomsSelected[listSymptomsSelected.indexOf(list[position])] = SymptomModel(0, date.toString(), list[position].symptom, "med")
-                                    } else {
-                                        listSymptomsSelected.add(SymptomModel(0, date.toString(), list[position].symptom, "med"))
-                                    }
-                                } else {
-                                    listSymptomsSelected.add(SymptomModel(0, date.toString(), list[position].symptom, "med"))
-                                }
-                            } catch (e: Exception) {
-
-                            }
-                        }
+                        setItemClicked("med", position, list)
                     }
                     else -> {
-                        if(listDb.size > 0){
-                            if (listDb[position].intensity != "") {
-                                listDb[position] = SymptomModel(listDb[position].id, date.toString(), list[position].symptom, "high")
-
-                            } else {
-                                try {
-                                    if (listSymptomsSelected.size > 0) {
-
-                                        if (listSymptomsSelected.stream().anyMatch { it.symptom == list[position].symptom }) {
-
-                                            listSymptomsSelected[listSymptomsSelected.indexOf(list[position])] = SymptomModel(listDb[position].id, date.toString(), list[position].symptom, "high")
-                                        } else {
-                                            listSymptomsSelected.add(SymptomModel(listDb[position].id, date.toString(), list[position].symptom, "high"))
-                                        }
-
-
-                                    } else {
-
-                                        listSymptomsSelected.add(SymptomModel(listDb[position].id, date.toString(), list[position].symptom, "high"))
-                                    }
-                                } catch (e: Exception) {
-
-                                }
-                            }
-                        }
-                        else {
-                            try {
-                                if (listSymptomsSelected.size > 0) {
-
-                                    if (listSymptomsSelected.stream().anyMatch { it.symptom == list[position].symptom }) {
-
-                                        listSymptomsSelected[listSymptomsSelected.indexOf(list[position])] = SymptomModel(0, date.toString(), list[position].symptom, "high")
-                                    } else {
-                                        listSymptomsSelected.add(SymptomModel(0, date.toString(), list[position].symptom, "high"))
-                                    }
-                                } else {
-                                    listSymptomsSelected.add(SymptomModel(0, date.toString(), list[position].symptom, "high"))
-                                }
-                            } catch (e: Exception) {
-
-                            }
-                        }
-
+                        setItemClicked("high", position, list)
                     }
                 }
             }
         }
         myTag = currentView.tag
-
     }
 
     override fun onPause() {
