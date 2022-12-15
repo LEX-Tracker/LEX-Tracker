@@ -242,7 +242,6 @@ class SymptomsFragment : Fragment(), MyItemSelected {
 
     var myTag: Any = ""
 
-
     fun addSelectedSymptom(
         sym_id: Int,
         position: Int,
@@ -309,13 +308,11 @@ class SymptomsFragment : Fragment(), MyItemSelected {
 
     }
     override fun myItemClicked(currentView: TextView, position: Int, list: ArrayList<SymptomModel>) {
-        // TODO: this needs refactoring too, it's more copy paste stuff
 
 
         if (!date.isEqual(defaultDate)){
             if (currentView.tag != myTag) {
                 when (currentView.tag) {
-
                     "low$position" -> {
                         populateSelectedSymptoms(
                             position,

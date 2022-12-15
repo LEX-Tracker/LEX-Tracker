@@ -93,10 +93,13 @@ class SharedPrefs(context: Context) {
     fun getLockOutDate(): LocalDateTime? {
 
         if (sharedPreferences != null){
-            return LocalDateTime.parse(sharedPreferences.getString("LOCKOUT_UNTIL", "1970-01-01 00:00"), formatter)
+            return LocalDateTime.parse(
+                sharedPreferences.getString("LOCKOUT_UNTIL", "1970-01-01 00:00:00"),
+                formatter
+            )
 
         }
-        return LocalDateTime.parse("1970-01-01 00:00",formatter)
+        return LocalDateTime.parse("1970-01-01 00:00:00",formatter)
     }
 
     fun setPin(value: String) {

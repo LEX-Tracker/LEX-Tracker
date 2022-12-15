@@ -36,7 +36,7 @@ public class CalendarCustomView extends LinearLayout implements CalenderUtils {
 
     private static final int MAX_CALENDAR_COLUMN = 42;
     private int month, year;
-    private DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+    private DateTimeFormatter defaultDateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
     public Calendar cal = Calendar.getInstance(Locale.ENGLISH);
     private Context context;
     public GridAdapter mAdapter;

@@ -6,13 +6,9 @@ import android.content.Context
 import android.util.Log
 
 import androidx.lifecycle.*
-import androidx.navigation.NavController
-import androidx.navigation.fragment.findNavController
 import com.digitalinterruption.lex.R
 import com.digitalinterruption.lex.SharedPrefs
 import com.digitalinterruption.lex.helpers.Event
-import kotlinx.coroutines.flow.*
-import kotlinx.coroutines.launch
 
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -44,7 +40,8 @@ class PinCodeViewModel(val prefs: SharedPrefs) : ViewModel() {
             val newPassCode = existingPinCode + number
             pinCode.postValue(newPassCode)
 
-            val formatter =  DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
+            val defaultDateFormater =  DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
+
             val currentTimestamp =  LocalDateTime.now()
             var message: String
 
@@ -68,7 +65,7 @@ class PinCodeViewModel(val prefs: SharedPrefs) : ViewModel() {
                     if (prefs.getLockOutDate()?.isAfter(currentTimestamp)!!){
                         val unformatted = prefs.getLockOutDate()
                         val formatted = unformatted?.format(
-                            DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm")
+                            defaultDateFormater
                         )
 
                         message = "Max retries reached! App locked until $formatted"
@@ -85,12 +82,12 @@ class PinCodeViewModel(val prefs: SharedPrefs) : ViewModel() {
                         Log.i("Pin Entry", message)
                     } else {
                         val lockoutTimestamp = currentTimestamp.plusHours(12)
-                        prefs.setLockOutDate(lockoutTimestamp.format(formatter))
+                        prefs.setLockOutDate(lockoutTimestamp.format(defaultDateFormater))
                         prefs.setIsLockedOut(true)
 
                         val unformatted = prefs.getLockOutDate()
                         val formatted = unformatted?.format(
-                            DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm")
+                            defaultDateFormater
                         )
 
                         message = "Max retries reached! App locked until $formatted"

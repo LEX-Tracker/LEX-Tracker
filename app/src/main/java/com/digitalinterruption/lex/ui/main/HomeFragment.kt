@@ -171,7 +171,7 @@ class HomeFragment : Fragment(), CalendarView.OnDateChangeListener {
                     } else {
                         val today = Calendar.getInstance()
                         today.time = Timestamp.valueOf(
-                            LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
+                            LocalDateTime.now().format(defaultDateTimeFormat)
                                 .toString())
 
                         val tappedDay = Calendar.getInstance()
@@ -179,7 +179,7 @@ class HomeFragment : Fragment(), CalendarView.OnDateChangeListener {
                             LocalDateTime.ofInstant(
                                 (adapterView.adapter.getItem(l.toInt()) as Date).toInstant(),
                                 ZoneOffset.systemDefault()
-                            ).format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
+                            ).format(defaultDateTimeFormat)
                                 .toString()
                         )
 
@@ -189,7 +189,7 @@ class HomeFragment : Fragment(), CalendarView.OnDateChangeListener {
                                     tappedDay.time.toInstant(),
                                     ZoneOffset.systemDefault()
                                 ).format(
-                                    DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
+                                    defaultDateTimeFormat
                                 ).toString()
                             )
                         findNavController().navigate(action)
@@ -223,6 +223,7 @@ class HomeFragment : Fragment(), CalendarView.OnDateChangeListener {
 
         listData.forEach {
             if (it.date != "") {
+
                 val date = LocalDateTime.parse(it.date, defaultDateTimeFormat) //this should be in the correct format anyway as we wrote it out in the correct format
 
                 if (oneTime) {
