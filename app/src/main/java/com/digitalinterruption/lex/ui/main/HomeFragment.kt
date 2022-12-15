@@ -64,7 +64,7 @@ class HomeFragment : Fragment(), CalendarView.OnDateChangeListener {
     val defaultDateTimeFormat: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
 
     //Colours
-    // initialse here but get correct values on view create
+    // initialise here but get correct values on view create
     var todayColor = R.color.blue
     var yellow = R.color.darkYellow
     var green = R.color.green
@@ -223,7 +223,8 @@ class HomeFragment : Fragment(), CalendarView.OnDateChangeListener {
 
         listData.forEach {
             if (it.date != "") {
-                val date = LocalDateTime.parse(it.date, defaultDateTimeFormat)
+
+                val date = LocalDateTime.parse(it.date, defaultDateTimeFormat) //this should be in the correct format anyway as we wrote it out in the correct format
 
                 if (oneTime) {
                     startDay = date.dayOfMonth

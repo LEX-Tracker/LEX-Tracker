@@ -23,7 +23,7 @@ class MyViewModel(application: Application) : AndroidViewModel(application) {
     val myDao: MyDao
 
     init {
-        myDatabase = MyDatabase.getDatabase(application)
+        myDatabase = MyDatabase.getDatabase(application)!!
         myDao = myDatabase.myDao()
         repository = MyRepository(myDao)
         readAllData = repository.readAllData

@@ -56,7 +56,7 @@ class SymptomsFragment : Fragment(), MyItemSelected {
                 if (
                     it.date != "" &&
                     ldt.toLocalDate().equals(
-                        LocalDateTime.parse(it.date).toLocalDate()
+                        LocalDateTime.parse(it.date, defaultDateFormat).toLocalDate()
                     )
                 ){
                     listSymptomsSelected.add(it)
@@ -85,7 +85,7 @@ class SymptomsFragment : Fragment(), MyItemSelected {
 
                 var pDate: LocalDateTime = LocalDateTime.parse(defaultDate.toString())
                 if (!it.date.isNullOrEmpty()){
-                    pDate = LocalDateTime.parse(it.date)
+                    pDate = LocalDateTime.parse(it.date, defaultDateFormat)
                 }
 
                 if (pDate.isEqual(date)) {
@@ -242,74 +242,100 @@ class SymptomsFragment : Fragment(), MyItemSelected {
 
     var myTag: Any = ""
 
-    fun populateSelectedSymptoms(sym_id: Int,
-                                 date: LocalDateTime,
-                                 list:  ArrayList<SymptomModel>,
-                                 position: Int,
-                                 intensity: String
-    ) {
-        if (listSymptomsSelected.size > 0) {
-            if (listSymptomsSelected.stream().anyMatch { it.symptom == list[position].symptom }) {
-                listSymptomsSelected[listSymptomsSelected.indexOf(list[position])] = SymptomModel(0, date.format(defaultDateFormat), list[position].symptom, intensity)
+    fun addSelectedSymptom(
+        sym_id: Int,
+        position: Int,
+        date: LocalDateTime,
+        list: ArrayList<SymptomModel>,
+        intensity: String){
+        val formattedDate = date.format(defaultDateFormat)
+        try {
+            if (listSymptomsSelected.size > 0) {
+                if (listSymptomsSelected.stream().anyMatch { it.symptom == list[position].symptom }) {
+                    listSymptomsSelected[listSymptomsSelected.indexOf(list[position])] =
+                        SymptomModel(
+                            0,
+                            formattedDate,
+                            list[position].symptom,
+                            intensity
+                        )
+                } else {
+                    listSymptomsSelected.add(
+                        SymptomModel(
+                            sym_id,
+                            formattedDate,
+                            list[position].symptom,
+                            intensity)
+                    )
+                }
             } else {
-                listSymptomsSelected.add(SymptomModel(sym_id, date.format(defaultDateFormat), list[position].symptom, intensity))
+                listSymptomsSelected.add(
+                    SymptomModel(
+                        sym_id,
+                        formattedDate,
+                        list[position].symptom,
+                        intensity
+                    )
+                )
             }
-        } else {
-            listSymptomsSelected.add(SymptomModel(sym_id, date.format(defaultDateFormat), list[position].symptom, intensity))
+        } catch (e: Exception) {
+            Log.e("error",e.toString())
         }
 
     }
-
-    fun setItemClicked(intensity: String, position: Int, list: ArrayList<SymptomModel>){
-
-        var sym_int = 0
-
+    fun populateSelectedSymptoms(
+        position: Int,
+        date: LocalDateTime,
+        list: ArrayList<SymptomModel>,
+        intensity: String){
+        var sym_id = 0
         if (listDb.size > 0){
-            sym_int = listDb[position].id
-            if (listDb[position].intensity !="") {
+            sym_id = listDb[position].id + 43 // blank symptoms
+            if (listDb[position].intensity != ""){
                 listDb[position] = SymptomModel(
-                    sym_int,
-                    date.toString(),
+                    listDb[position].id,
+                    date.format(defaultDateFormat),
                     list[position].symptom,
                     intensity
                 )
-            } else {
-                try {
-                    populateSelectedSymptoms(
-                        sym_int,
-                        date,
-                        list,
-                        position,
-                        intensity
-                    )
-
-                }catch (e: Exception){
-
-                }
+            }else{
+                addSelectedSymptom(sym_id,position,date,list,intensity)
             }
         }else{
-            populateSelectedSymptoms(
-                sym_int,
-                date,
-                list,
-                position,
-                intensity
-            )
+            addSelectedSymptom(sym_id,position,date,list,intensity)
         }
+
+
     }
     override fun myItemClicked(currentView: TextView, position: Int, list: ArrayList<SymptomModel>) {
-        if (!date.isEqual(defaultDate)){
 
+
+        if (!date.isEqual(defaultDate)){
             if (currentView.tag != myTag) {
                 when (currentView.tag) {
                     "low$position" -> {
-                        setItemClicked("low", position, list)
+                        populateSelectedSymptoms(
+                            position,
+                            date,
+                            list,
+                            "low"
+                        )
                     }
                     "med$position" -> {
-                        setItemClicked("med", position, list)
+                        populateSelectedSymptoms(
+                            position,
+                            date,
+                            list,
+                            "med"
+                        )
                     }
                     else -> {
-                        setItemClicked("high", position, list)
+                        populateSelectedSymptoms(
+                            position,
+                            date,
+                            list,
+                            "high"
+                        )
                     }
                 }
             }

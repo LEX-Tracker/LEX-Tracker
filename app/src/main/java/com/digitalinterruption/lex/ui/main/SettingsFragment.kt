@@ -337,7 +337,7 @@ class SettingsFragment : Fragment() {
             var _file: DocumentFile? = null
             var expDir: DocumentFile? = null
             val timeStamp = LocalDateTime.now().format(
-                DateTimeFormatter.ofPattern("yyyy_MM_dd_HH_mm")
+                DateTimeFormatter.ofPattern("yyyy_MM_dd_HH_mm") //this is for export name only
             ).toString()
 
             if (dest?.findFile("Exported")==null){
