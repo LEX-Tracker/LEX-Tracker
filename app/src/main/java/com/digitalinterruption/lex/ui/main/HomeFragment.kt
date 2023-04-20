@@ -1,7 +1,6 @@
 package com.digitalinterruption.lex.ui.main
 
 import android.content.Context
-import android.graphics.Color
 import android.os.Bundle
 import android.os.CountDownTimer
 import android.util.Log
@@ -19,7 +18,6 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
-import com.digitalinterruption.lex.MainActivity
 import com.digitalinterruption.lex.R
 import com.digitalinterruption.lex.SharedPrefs
 import com.digitalinterruption.lex.calender.CalendarCustomView
@@ -36,6 +34,7 @@ import kotlinx.coroutines.withContext
 import java.time.LocalDateTime
 import java.time.ZoneOffset
 import java.sql.Timestamp
+import java.time.LocalDate
 import java.util.*
 import java.time.format.DateTimeFormatter
 
@@ -52,8 +51,8 @@ class HomeFragment : Fragment(), CalendarView.OnDateChangeListener {
     var selectedDates: List<Date>? = null
     var start: LocalDateTime? = null
     var end: LocalDateTime? = null
-    var initialDate: LocalDateTime? = null
-    var lastDate: LocalDateTime? = null
+    var initialDate: LocalDateTime? = LocalDate.parse("1970-01-01").atStartOfDay()
+    var lastDate: LocalDateTime? = initialDate
     var startDay: Int = 0
     var oneTime: Boolean = true
     var oneTimeEvent: Boolean = true
@@ -76,7 +75,9 @@ class HomeFragment : Fragment(), CalendarView.OnDateChangeListener {
         val seedDate = _seedDate?.minusDays(4)
         val duressData: MutableList<SymptomModel> = arrayListOf()
 
-        duressData.add(0, SymptomModel(1, seedDate?.format(defaultDateTimeFormat),"Bleeding", "high"))
+        if (seedDate != null) {
+            duressData.add(0, SymptomModel(1, seedDate.format(defaultDateTimeFormat),"Bleeding", "high"))
+        }
 
         //ToDo: make this more robust
         var i = 1
@@ -96,8 +97,6 @@ class HomeFragment : Fragment(), CalendarView.OnDateChangeListener {
             myViewModel.readAllData.observe(viewLifecycleOwner) {
                 if (it.stream().anyMatch { it.date != "" }) {
                     Companion.listData.addAll(it)
-                }else{
-                    Log.d("populate", "symptom already in list:$it")
                 }
             }
         }else{
@@ -167,7 +166,6 @@ class HomeFragment : Fragment(), CalendarView.OnDateChangeListener {
                 OnItemClickListener { adapterView, view, i, l ->
 
                     if (adapterView.adapter.getView(l.toInt(), null, null).alpha == 0.4f) { //WHAT?
-                        Log.d("hello", "hello")
                     } else {
                         val today = Calendar.getInstance()
                         today.time = Timestamp.valueOf(
@@ -215,7 +213,7 @@ class HomeFragment : Fragment(), CalendarView.OnDateChangeListener {
         val eventObjectToday = EventObject(
             80,
             "Today",
-            LocalDateTime.now(),
+            LocalDate.now(),
             todayColor
         )
 
@@ -224,29 +222,28 @@ class HomeFragment : Fragment(), CalendarView.OnDateChangeListener {
         listData.forEach {
             if (it.date != "") {
 
-                val date = LocalDateTime.parse(it.date, defaultDateTimeFormat) //this should be in the correct format anyway as we wrote it out in the correct format
+                val date = LocalDate.parse(it.date) //this should be in the correct format anyway as we wrote it out in the correct format
 
                 if (oneTime) {
                     startDay = date.dayOfMonth
                     oneTime = false
                 }
-
                 if (startDay > date.dayOfMonth){
                     startDay = date.dayOfMonth
                 }
 
                 if (it.intensity != "") {
-                    initialDate = date
+                    initialDate = date.atStartOfDay()
                     var eventObject: EventObject? = null
 
-                    if (date != lastDate) {
-                        eventObject = EventObject(it.id, "     ", date, yellow)
-                        if (it.symptom != "Bleeding") {
-                            eventObject.color = green
-                        } else {
-                            eventObject.color = yellow
+                    if (!date.isEqual(lastDate?.toLocalDate())) {
+                            eventObject = EventObject(it.id, "     ", date, yellow)
+                            if (it.symptom != "Bleeding") {
+                                eventObject.color = green
+                            } else {
+                                eventObject.color = yellow
+                            }
                         }
-                    }
 
                     if (it.symptom == "Bleeding") {
                         if (prefs.getOvulationEnabled()) {
@@ -261,7 +258,7 @@ class HomeFragment : Fragment(), CalendarView.OnDateChangeListener {
                         mEvents.add(eventObject)
                     }
                 }
-                lastDate = date
+                lastDate = date.atStartOfDay()
             }
         }
         return mEvents
@@ -329,7 +326,7 @@ class HomeFragment : Fragment(), CalendarView.OnDateChangeListener {
         var days = 13
         while (days < 19) {
 
-            val date = LocalDateTime.parse(symptom.date, defaultDateTimeFormat)
+            val date = LocalDate.parse(symptom.date).atStartOfDay()
                 .plusDays( -days.toLong())
                 .plusMonths(1)
             if (symptom.symptom == "Bleeding"){ //ToDo: workout how non-bleeding events ended up in here
@@ -337,7 +334,7 @@ class HomeFragment : Fragment(), CalendarView.OnDateChangeListener {
                     EventObject(
                         symptom.id + 1,
                         "ov" ,
-                        date,
+                        date.toLocalDate(),
                         ov
                     )
                 )
@@ -351,7 +348,7 @@ class HomeFragment : Fragment(), CalendarView.OnDateChangeListener {
     fun populatePMSEvents(mEvents: MutableList<EventObject>, symptom: SymptomModel){
         var days = 5
         while (days > 0) {
-            val date = LocalDateTime.parse(symptom.date, defaultDateTimeFormat)
+            val date = LocalDate.parse(symptom.date).atStartOfDay()
                 .plusDays(-days.toLong())
                 .plusMonths(1)
             if (symptom.symptom == "Bleeding"){
@@ -359,7 +356,7 @@ class HomeFragment : Fragment(), CalendarView.OnDateChangeListener {
                     EventObject(
                         symptom.id + 1,
                         "",
-                        date,
+                        date.toLocalDate(),
                         pms
                     )
                 )

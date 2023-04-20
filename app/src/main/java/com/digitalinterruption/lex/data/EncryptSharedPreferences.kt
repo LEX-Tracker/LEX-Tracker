@@ -17,6 +17,7 @@ class EncryptSharedPreferences constructor(context: Context){
         val masterKey = MasterKey.Builder(context)
             .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
             .build()
+
         sharedPreferences = EncryptedSharedPreferences.create(
             context,
             "Lex",

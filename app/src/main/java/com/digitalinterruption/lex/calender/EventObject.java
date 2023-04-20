@@ -1,5 +1,6 @@
 package com.digitalinterruption.lex.calender;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 public class EventObject {
@@ -7,18 +8,18 @@ public class EventObject {
     private String message;
     private LocalDateTime date;
     private int color;
-    public EventObject(String message, LocalDateTime date) {
+    public EventObject(String message, LocalDate date) {
         this.message = message;
-        this.date = date;
+        this.date = date.atStartOfDay();
     }
-    public EventObject(int id, String message, LocalDateTime date) {
-        this.date = date;
+    public EventObject(int id, String message, LocalDate date) {
+        this.date = date.atStartOfDay();
         this.message = message;
         this.id = id;
     }
 
-    public EventObject(int id, String message, LocalDateTime date, int color){
-        this.date = date;
+    public EventObject(int id, String message, LocalDate date, int color){
+        this.date = date.atStartOfDay();
         this.message = message;
         this.id = id;
         this.color = color;

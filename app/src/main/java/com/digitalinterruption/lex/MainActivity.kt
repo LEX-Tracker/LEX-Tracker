@@ -22,8 +22,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     companion object {
-        var month = 0
-        var year = 0
         var date: LocalDateTime = LocalDateTime.now()
     }
 }
