@@ -2,6 +2,7 @@ package com.digitalinterruption.lex.adapters
 
 import android.content.Context
 import android.content.res.ColorStateList
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -136,7 +137,6 @@ class SymptomsAdapter(private val list: ArrayList<SymptomModel>, private val con
             }
 
         }
-
     }
 
     override fun getItemCount(): Int {

@@ -26,6 +26,7 @@ import com.digitalinterruption.lex.databinding.FragmentSymptomsBinding
 import com.digitalinterruption.lex.models.MyViewModel
 import com.digitalinterruption.lex.models.SymptomModel
 import kotlinx.coroutines.*
+import kotlinx.coroutines.selects.select
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -42,27 +43,45 @@ class SymptomsFragment : Fragment(), MyItemSelected {
 
     private val myViewModel: MyViewModel by viewModels()
     private val defaultDateFormat: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
+    private val defaultShortDateFormat: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-mm-dd")
 
     private val defaultDate: LocalDateTime = LocalDateTime.parse("1970-01-01 00:00:00", defaultDateFormat)
 
     var date: LocalDateTime = defaultDate
-    var dbDate: LocalDateTime = defaultDate
+    var dbDate: LocalDate = defaultDate.toLocalDate()
     val args: SymptomsFragmentArgs by navArgs()
     lateinit var prefs: SharedPrefs
 
     fun populateSymptoms(ldt: LocalDateTime){
         myViewModel.readAllData.observe(viewLifecycleOwner){data ->
             data.forEach{
+
                 if (
                     it.date != "" &&
                     ldt.toLocalDate().equals(
-                        LocalDateTime.parse(it.date, defaultDateFormat).toLocalDate()
+                        LocalDate.parse(it.date)
                     )
                 ){
                     listSymptomsSelected.add(it)
                 }
             }
         }
+    }
+
+    fun populateSymptomsFiltered(ldt: LocalDateTime, filter: String){
+        myViewModel.readAllData.observe(viewLifecycleOwner){data ->
+            data.forEach{
+                if (
+                    it.date != "" &&
+                    ldt.toLocalDate().equals(
+                        LocalDateTime.parse(it.date, defaultDateFormat).toLocalDate()
+                    ) && it.symptom.contentEquals(filter)
+                ){
+                    listSymptomsSelected.add(it)
+                }
+            }
+        }
+
     }
 
     override fun onCreateView(
@@ -85,16 +104,19 @@ class SymptomsFragment : Fragment(), MyItemSelected {
 
                 var pDate: LocalDateTime = LocalDateTime.parse(defaultDate.toString())
                 if (!it.date.isNullOrEmpty()){
-                    pDate = LocalDateTime.parse(it.date, defaultDateFormat)
+                    pDate = LocalDate.parse(it.date).atStartOfDay()
                 }
 
                 if (pDate.isEqual(date)) {
-                    dbDate = pDate
+                    dbDate = pDate.toLocalDate()
                     listDb.add(it)
                 }
 
                 if (it.intensity == "") {
-                    listSymptomsData.add(it)
+                    // check it doesn't exist first
+                    if (!listSymptomsData.contains(it)){
+                        listSymptomsData.add(it)
+                    }
                 }
 
 
@@ -134,7 +156,7 @@ class SymptomsFragment : Fragment(), MyItemSelected {
                         LocalDateTime.parse("1970-01-01 00:00:00", defaultDateFormat)
                     )
                 ) {
-                    if (date.isEqual(dbDate)) {
+                    if (date.toLocalDate().isEqual(dbDate)) { // we only really need the date here
                         binding?.recyclerView?.adapter = SymptomsAdapter(listDb, requireContext(), this@SymptomsFragment)
                     } else {
                         binding?.recyclerView?.adapter = SymptomsAdapter(listSymptomsData, requireContext(), this@SymptomsFragment)
@@ -228,7 +250,6 @@ class SymptomsFragment : Fragment(), MyItemSelected {
         listSymptomsSelected.clear()
 
         super.onDestroyView()
-//        requireActivity().window.clearFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS)
         _binding = null
     }
 
@@ -242,98 +263,99 @@ class SymptomsFragment : Fragment(), MyItemSelected {
 
     var myTag: Any = ""
 
+
+    fun getSelectedSymptomsForDate(date: LocalDate):  List<SymptomModel>{
+        val filtered = listDb.filter{ // listDb is all items
+                item -> item.date != "" &&
+                item.date == date.toString()
+        }
+        for (symptom in filtered){
+            Log.d("filtered", symptom.symptom.toString())
+        }
+
+        return filtered
+    }
+
     fun addSelectedSymptom(
         sym_id: Int,
         position: Int,
-        date: LocalDateTime,
+        date: LocalDate,
         list: ArrayList<SymptomModel>,
         intensity: String){
-        val formattedDate = date.format(defaultDateFormat)
-        try {
-            if (listSymptomsSelected.size > 0) {
-                if (listSymptomsSelected.stream().anyMatch { it.symptom == list[position].symptom }) {
-                    listSymptomsSelected[listSymptomsSelected.indexOf(list[position])] =
-                        SymptomModel(
-                            0,
-                            formattedDate,
-                            list[position].symptom,
-                            intensity
-                        )
-                } else {
-                    listSymptomsSelected.add(
-                        SymptomModel(
-                            sym_id,
-                            formattedDate,
-                            list[position].symptom,
-                            intensity)
-                    )
-                }
-            } else {
-                listSymptomsSelected.add(
-                    SymptomModel(
+        val debug_tag = "addSelectedSymptom"
+        try{
+            listDb.add(
+              SymptomModel(
                         sym_id,
-                        formattedDate,
-                        list[position].symptom,
+                        date.toString(),
+                        list[position].symptom, //todo: change way this works - its a bit murky
                         intensity
                     )
                 )
-            }
-        } catch (e: Exception) {
-            Log.e("error",e.toString())
-        }
 
+            myViewModel.addData(listDb)
+
+
+
+        }catch (e: java.lang.Exception){
+            Log.e(debug_tag,e.toString())
+        }
     }
-    fun populateSelectedSymptoms(
-        position: Int,
-        date: LocalDateTime,
-        list: ArrayList<SymptomModel>,
-        intensity: String){
-        var sym_id = 0
-        if (listDb.size > 0){
-            sym_id = listDb[position].id + 43 // blank symptoms
-            if (listDb[position].intensity != ""){
-                listDb[position] = SymptomModel(
-                    listDb[position].id,
-                    date.format(defaultDateFormat),
-                    list[position].symptom,
-                    intensity
-                )
-            }else{
-                addSelectedSymptom(sym_id,position,date,list,intensity)
-            }
-        }else{
-            addSelectedSymptom(sym_id,position,date,list,intensity)
+
+
+    fun populateSelectedSymptoms(date: LocalDate){
+        val blankSymptoms = listDb.filter { item -> item.date == "" }
+        val symptomsToday = getSelectedSymptomsForDate(date)
+
+        for (symptom in symptomsToday){
+            Log.d("symptom", symptom.symptom.toString())
+        }
+    }
+
+    fun setSymptomSeverity(position: Int, date: LocalDate, intensity: String){
+        var selectedSymptom = listDb[position]
+        var sym_id = selectedSymptom.id + 43 //this will need to change to be one more than the size of the total record count in the listDb
+        val symptomsToday = getSelectedSymptomsForDate(date)
+        val found = symptomsToday.filter {
+                item -> item.symptom == selectedSymptom.symptom
         }
 
+        if (found.isNotEmpty()){
+            listDb[listDb.indexOf(found[0])] = SymptomModel(
+                found[0].id,
+                date.toString(),
+                selectedSymptom.symptom,
+                intensity
+            )
+        }else{
+            addSelectedSymptom(sym_id,position,date,listDb,intensity)
+        }
+        listSymptomsSelected.clear()
+        myViewModel.addData(listDb)
 
     }
     override fun myItemClicked(currentView: TextView, position: Int, list: ArrayList<SymptomModel>) {
-
-
         if (!date.isEqual(defaultDate)){
             if (currentView.tag != myTag) {
                 when (currentView.tag) {
                     "low$position" -> {
-                        populateSelectedSymptoms(
+                        setSymptomSeverity(
                             position,
-                            date,
-                            list,
+                            date.toLocalDate(),
                             "low"
                         )
                     }
                     "med$position" -> {
-                        populateSelectedSymptoms(
+                        setSymptomSeverity(
                             position,
-                            date,
-                            list,
+                            date.toLocalDate(),
                             "med"
                         )
                     }
                     else -> {
-                        populateSelectedSymptoms(
+                        setSymptomSeverity(
                             position,
-                            date,
-                            list,
+                            date.toLocalDate(),
                             "high"
                         )
                     }
@@ -341,17 +363,14 @@ class SymptomsFragment : Fragment(), MyItemSelected {
             }
         }
         myTag = currentView.tag
+
     }
 
     override fun onPause() {
         if (!date.isEqual(defaultDate)) {
-            if (listSymptomsSelected.size == 0) {
                 listDb.forEach { it1 ->
                     it1.intensity?.let { it1.date?.let { it2 -> it1.symptom?.let { it3 -> myViewModel.updateData(it, it2, it3) } } }
                 }
-            } else {
-                myViewModel.addData(listSymptomsSelected)
-            }
         }
         super.onPause()
     }

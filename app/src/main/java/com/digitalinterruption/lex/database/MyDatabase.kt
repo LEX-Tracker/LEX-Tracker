@@ -29,9 +29,9 @@ abstract class MyDatabase : RoomDatabase() {
                     context.applicationContext,
                     MyDatabase::class.java,
                     "lex_database")
-                val factory = SupportFactory(SQLiteDatabase.getBytes(encryptionPW?.toCharArray()))//
+                val factory = SupportFactory(SQLiteDatabase.getBytes(encryptionPW?.toCharArray()))// this bit
                 return instance
-                    .openHelperFactory(factory)
+                    .openHelperFactory(factory) //this bit
                     .enableMultiInstanceInvalidation()
                     .build()
 

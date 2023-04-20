@@ -27,7 +27,6 @@ class SharedPrefs(context: Context) {
 
     }
 
-
     fun setIsPinSet(value: Boolean) {
         sharedPreferences?.edit()?.putBoolean("PIN_CODE_SET", value)?.apply()
     }
