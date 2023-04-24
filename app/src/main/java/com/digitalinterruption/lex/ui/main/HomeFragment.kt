@@ -40,7 +40,7 @@ import java.time.format.DateTimeFormatter
 
 
 class HomeFragment : Fragment(), CalendarView.OnDateChangeListener {
-    private var startMonth: Int = 0
+    var defaultShortDateFormat: DateTimeFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
     private var _binding: FragmentHomeBinding? = null
     private val binding get() = _binding
     private lateinit var callback: OnBackPressedCallback
@@ -222,7 +222,7 @@ class HomeFragment : Fragment(), CalendarView.OnDateChangeListener {
         listData.forEach {
             if (it.date != "") {
 
-                val date = LocalDate.parse(it.date) //this should be in the correct format anyway as we wrote it out in the correct format
+                val date = LocalDate.parse(it.date, defaultShortDateFormat) //this should be in the correct format anyway as we wrote it out in the correct format
 
                 if (oneTime) {
                     startDay = date.dayOfMonth
@@ -326,7 +326,7 @@ class HomeFragment : Fragment(), CalendarView.OnDateChangeListener {
         var days = 13
         while (days < 19) {
 
-            val date = LocalDate.parse(symptom.date).atStartOfDay()
+            val date = LocalDate.parse(symptom.date, defaultShortDateFormat).atStartOfDay()
                 .plusDays( -days.toLong())
                 .plusMonths(1)
             if (symptom.symptom == "Bleeding"){ //ToDo: workout how non-bleeding events ended up in here
@@ -348,7 +348,7 @@ class HomeFragment : Fragment(), CalendarView.OnDateChangeListener {
     fun populatePMSEvents(mEvents: MutableList<EventObject>, symptom: SymptomModel){
         var days = 5
         while (days > 0) {
-            val date = LocalDate.parse(symptom.date).atStartOfDay()
+            val date = LocalDate.parse(symptom.date, defaultShortDateFormat).atStartOfDay()
                 .plusDays(-days.toLong())
                 .plusMonths(1)
             if (symptom.symptom == "Bleeding"){

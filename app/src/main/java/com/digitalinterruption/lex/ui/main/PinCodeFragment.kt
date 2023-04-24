@@ -17,6 +17,7 @@ import com.digitalinterruption.lex.SharedPrefs
 import com.digitalinterruption.lex.databinding.FragmentPinCodeBinding
 import com.digitalinterruption.lex.helpers.EventObserver
 
+
 class PinCodeFragment : Fragment(){
     lateinit var binding: FragmentPinCodeBinding
 
