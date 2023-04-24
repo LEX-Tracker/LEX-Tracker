@@ -43,7 +43,7 @@ class SymptomsFragment : Fragment(), MyItemSelected {
 
     private val myViewModel: MyViewModel by viewModels()
     private val defaultDateFormat: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
-    private val defaultShortDateFormat: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-mm-dd")
+    private val defaultShortDateFormat: DateTimeFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
 
     private val defaultDate: LocalDateTime = LocalDateTime.parse("1970-01-01 00:00:00", defaultDateFormat)
 
@@ -59,7 +59,7 @@ class SymptomsFragment : Fragment(), MyItemSelected {
                 if (
                     it.date != "" &&
                     ldt.toLocalDate().equals(
-                        LocalDate.parse(it.date)
+                        LocalDate.parse(it.date, defaultShortDateFormat)
                     )
                 ){
                     listSymptomsSelected.add(it)
@@ -104,7 +104,7 @@ class SymptomsFragment : Fragment(), MyItemSelected {
 
                 var pDate: LocalDateTime = LocalDateTime.parse(defaultDate.toString())
                 if (!it.date.isNullOrEmpty()){
-                    pDate = LocalDate.parse(it.date).atStartOfDay()
+                    pDate = LocalDate.parse(it.date, defaultShortDateFormat).atStartOfDay()
                 }
 
                 if (pDate.isEqual(date)) {

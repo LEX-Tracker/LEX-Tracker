@@ -46,6 +46,7 @@ import net.lingala.zip4j.model.enums.EncryptionMethod
 import java.io.File
 import java.io.FileReader
 import java.io.FileWriter
+import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
@@ -61,6 +62,7 @@ class SettingsFragment : Fragment() {
     var isExport: Boolean = false
     lateinit var prefs: SharedPrefs
     private val defaultDateFormat: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
+    private val defaultShortDateFormat: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
 
     private fun checkPinCollision(duressPin: String): Boolean {
         if (
@@ -297,9 +299,14 @@ class SettingsFragment : Fragment() {
                     }else{
 
                         nextLine?.let { nextLine ->
+                            var parsedDate = ""
+                            if (nextLine[1] != ""){
+                                parsedDate = LocalDate.parse(nextLine[1], DateTimeFormatter.ofPattern("dd/MM/yyyy"))
+                                    .format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))
+                            }
                             var _symptoms = SymptomModel(
                                     nextLine[0].toInt(), // id
-                                    LocalDateTime.parse(nextLine[1]).format(defaultDateFormat),         // date
+                                    parsedDate,         // date
                                     sanitiseText(nextLine[2]),         // symptom
                                     nextLine[3]          // intensity
                                 )
@@ -368,7 +375,15 @@ class SettingsFragment : Fragment() {
 
                 val arrStr = arrayOfNulls<String>(curCSV.columnCount)
                 for (i in 0 until curCSV.columnCount) {
+                    if (i==1){
+                        if (curCSV.getString(i).isNotEmpty()){
+                            arrStr[i] = curCSV.getString(i)
+                        }else{
+                            arrStr[i] = ""
+                        }
+                    }else{
                     arrStr[i] = curCSV.getString(i)
+                    }
                 }
                 csvWrite.writeNext(arrStr)
             }
