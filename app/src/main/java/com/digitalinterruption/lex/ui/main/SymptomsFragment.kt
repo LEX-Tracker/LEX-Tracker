@@ -286,7 +286,7 @@ class SymptomsFragment : Fragment(), MyItemSelected {
             listDb.add(
               SymptomModel(
                         sym_id,
-                        date.toString(),
+                        date.format(defaultShortDateFormat),
                         list[position].symptom, //todo: change way this works - its a bit murky
                         intensity
                     )
@@ -322,7 +322,7 @@ class SymptomsFragment : Fragment(), MyItemSelected {
         if (found.isNotEmpty()){
             listDb[listDb.indexOf(found[0])] = SymptomModel(
                 found[0].id,
-                date.toString(),
+                date.format(defaultShortDateFormat).toString(),
                 selectedSymptom.symptom,
                 intensity
             )
