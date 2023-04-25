@@ -31,6 +31,7 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.digitalinterruption.lex.R
 import com.digitalinterruption.lex.SharedPrefs
+import com.digitalinterruption.lex.database.MyDao
 import com.digitalinterruption.lex.databinding.FragmentSettingsBinding
 import com.digitalinterruption.lex.models.MyViewModel
 import com.digitalinterruption.lex.models.SymptomModel
@@ -61,6 +62,7 @@ class SettingsFragment : Fragment() {
     var isExport: Boolean = false
     lateinit var prefs: SharedPrefs
     private val defaultDateFormat: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
+    private var clearDataClickCount: Int = 0
 
     private fun checkPinCollision(duressPin: String): Boolean {
         if (
@@ -90,6 +92,10 @@ class SettingsFragment : Fragment() {
 
         binding?.switchOwp?.isChecked = prefs.getOvulationEnabled()
         binding?.switchPms?.isChecked = prefs.getPmsEnabled()
+
+        binding?.clearData?.setOnClickListener {
+            clearDataButtonPress()
+        }
 
         binding?.ivHome?.setOnClickListener {
             moveToNext("Home")
@@ -455,6 +461,36 @@ class SettingsFragment : Fragment() {
         }
     }
 
+    private fun clearDataButtonPress(){
+
+        if (clearDataClickCount > 1){
+            Log.d("settingsFragment", "data cleared")
+            //use the clearSymptoms function from the Dao
+            myViewModel.clearSymptoms()
+            clearDataClickCount = 0
+            Toast.makeText(
+                context,
+                "Data Cleared",
+                Toast.LENGTH_SHORT
+            ).show()
+
+        }else{
+            Toast.makeText(
+                context,
+                "Press again to clear data",
+                Toast.LENGTH_SHORT
+            ).show()
+            clearDataClickCount += 1
+            countDown = object: CountDownTimer(2000, 1000){
+            override fun onTick(millisUntilFinished: Long){}
+            override fun onFinish(){
+                clearDataClickCount = 0
+            }
+
+        }
+        countDown.start()
+        }
+    }
     private fun fragmentBackPress() {
         callback = object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {

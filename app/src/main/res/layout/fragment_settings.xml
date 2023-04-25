@@ -24,7 +24,6 @@
         <ScrollView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="@dimen/_80sdp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -33,6 +32,7 @@
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
+
 
                 <androidx.cardview.widget.CardView
                     android:id="@+id/ows_layout"
@@ -218,6 +218,47 @@
 
                 </androidx.cardview.widget.CardView>
 
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/clear_data"
+                    android:layout_width="349dp"
+                    android:layout_height="61dp"
+                    android:layout_margin="16dp"
+                    android:background="#999"
+                    android:elevation="6dp"
+                    app:cardCornerRadius="@dimen/_18sdp"
+                    app:contentPadding="6dp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/import_layout">
+
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:id="@+id/title24"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_centerVertical="true"
+                            android:layout_gravity="center_vertical"
+                            android:layout_marginEnd="@dimen/_6sdp"
+                            android:fontFamily="@font/arialnovabold"
+                            android:paddingStart="@dimen/_10sdp"
+                            android:text="Clear Data"
+                            android:textColor="@color/black"
+                            android:textSize="@dimen/_12sdp"
+
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent" />
+
+
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+                </androidx.cardview.widget.CardView>
+
                 <EditText
                     android:id="@+id/secondary_pin"
                     android:layout_width="0dp"
@@ -232,9 +273,9 @@
                     android:paddingHorizontal="@dimen/_10sdp"
                     android:paddingVertical="@dimen/_12sdp"
                     android:textSize="@dimen/_12sdp"
-                    app:layout_constraintEnd_toEndOf="@+id/import_layout"
-                    app:layout_constraintStart_toStartOf="@+id/import_layout"
-                    app:layout_constraintTop_toBottomOf="@id/import_layout" />
+                    app:layout_constraintEnd_toEndOf="@+id/clear_data"
+                    app:layout_constraintStart_toStartOf="@+id/clear_data"
+                    app:layout_constraintTop_toBottomOf="@id/clear_data" />
 
 
             </androidx.constraintlayout.widget.ConstraintLayout>

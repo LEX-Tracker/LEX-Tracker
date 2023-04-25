@@ -20,4 +20,7 @@ interface MyDao {
 
     @Query("SELECT * from sym_table")
     fun getAllData(): LiveData<List<SymptomModel>>
+
+    @Query("DELETE FROM sym_table")
+    fun clearSymptoms()
 }
