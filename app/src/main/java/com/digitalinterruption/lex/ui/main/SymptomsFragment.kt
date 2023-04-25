@@ -103,7 +103,8 @@ class SymptomsFragment : Fragment(), MyItemSelected {
 
                 var pDate: LocalDateTime = LocalDateTime.parse(defaultDate.toString())
                 if (!it.date.isNullOrEmpty()){
-                    pDate = LocalDate.parse(it.date,defaultShortDateFormat).atStartOfDay()
+
+                    pDate = LocalDate.parse(it.date, defaultShortDateFormat).atStartOfDay()
                 }
 
                 if (pDate.isEqual(date)) {

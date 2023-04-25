@@ -40,7 +40,7 @@ import java.time.format.DateTimeFormatter
 
 
 class HomeFragment : Fragment(), CalendarView.OnDateChangeListener {
-    private var startMonth: Int = 0
+    var defaultShortDateFormat: DateTimeFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
     private var _binding: FragmentHomeBinding? = null
     private val binding get() = _binding
     private lateinit var callback: OnBackPressedCallback
@@ -327,7 +327,9 @@ class HomeFragment : Fragment(), CalendarView.OnDateChangeListener {
         var days = 13
         while (days < 19) {
 
-            val date = LocalDate.parse(symptom.date,defaultShortDateFormat).atStartOfDay()
+
+            val date = LocalDate.parse(symptom.date, defaultShortDateFormat).atStartOfDay()
+
                 .plusDays( -days.toLong())
                 .plusMonths(1)
             if (symptom.symptom == "Bleeding"){ //ToDo: workout how non-bleeding events ended up in here
