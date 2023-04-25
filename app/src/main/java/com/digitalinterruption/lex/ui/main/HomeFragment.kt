@@ -40,7 +40,6 @@ import java.time.format.DateTimeFormatter
 
 
 class HomeFragment : Fragment(), CalendarView.OnDateChangeListener {
-    var defaultShortDateFormat: DateTimeFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
     private var _binding: FragmentHomeBinding? = null
     private val binding get() = _binding
     private lateinit var callback: OnBackPressedCallback
