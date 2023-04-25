@@ -48,6 +48,7 @@ import java.io.File
 import java.io.FileReader
 import java.io.FileWriter
 import java.time.LocalDateTime
+import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
 
@@ -61,7 +62,7 @@ class SettingsFragment : Fragment() {
     val myViewModel: MyViewModel by viewModels()
     var isExport: Boolean = false
     lateinit var prefs: SharedPrefs
-    private val defaultDateFormat: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
+    private val defaultShortDateFormat: DateTimeFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
     private var clearDataClickCount: Int = 0
 
     private fun checkPinCollision(duressPin: String): Boolean {
@@ -302,10 +303,15 @@ class SettingsFragment : Fragment() {
                         lineCount += 1
                     }else{
 
-                        nextLine?.let { nextLine ->
+                         nextLine?.let {
+                                nextLine ->
+                            var parsedDate =""
+                            if (nextLine[1] != ""){
+                                 parsedDate = LocalDate.parse(nextLine[1],defaultShortDateFormat).format(defaultShortDateFormat)
+                             }
                             var _symptoms = SymptomModel(
                                     nextLine[0].toInt(), // id
-                                    LocalDateTime.parse(nextLine[1]).format(defaultDateFormat),         // date
+                                    parsedDate,         // date
                                     sanitiseText(nextLine[2]),         // symptom
                                     nextLine[3]          // intensity
                                 )
@@ -374,7 +380,15 @@ class SettingsFragment : Fragment() {
 
                 val arrStr = arrayOfNulls<String>(curCSV.columnCount)
                 for (i in 0 until curCSV.columnCount) {
-                    arrStr[i] = curCSV.getString(i)
+                    if (i==1){
+                        if (curCSV.getString(i).isNotEmpty()){
+                            arrStr[1] = curCSV.getString(i)
+                        }else{
+                            arrStr[i] = ""
+                        }
+                    }else{
+                        arrStr[i] = curCSV.getString(i)
+                    }
                 }
                 csvWrite.writeNext(arrStr)
             }
@@ -473,7 +487,7 @@ class SettingsFragment : Fragment() {
                 "Data Cleared",
                 Toast.LENGTH_SHORT
             ).show()
-
+            requireActivity().finishAndRemoveTask()
         }else{
             Toast.makeText(
                 context,
