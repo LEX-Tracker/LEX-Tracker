@@ -41,6 +41,12 @@ class MyViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
+    fun clearSymptoms(){
+        viewModelScope.launch {
+            repository.clearSymptoms()
+        }
+    }
+
 
 
 }

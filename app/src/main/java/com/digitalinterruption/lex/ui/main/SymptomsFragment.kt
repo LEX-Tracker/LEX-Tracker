@@ -26,7 +26,6 @@ import com.digitalinterruption.lex.databinding.FragmentSymptomsBinding
 import com.digitalinterruption.lex.models.MyViewModel
 import com.digitalinterruption.lex.models.SymptomModel
 import kotlinx.coroutines.*
-import kotlinx.coroutines.selects.select
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -104,6 +103,7 @@ class SymptomsFragment : Fragment(), MyItemSelected {
 
                 var pDate: LocalDateTime = LocalDateTime.parse(defaultDate.toString())
                 if (!it.date.isNullOrEmpty()){
+
                     pDate = LocalDate.parse(it.date, defaultShortDateFormat).atStartOfDay()
                 }
 
@@ -118,7 +118,6 @@ class SymptomsFragment : Fragment(), MyItemSelected {
                         listSymptomsData.add(it)
                     }
                 }
-
 
             if (!listDb.contains(it)){
                 listDb.add(it)
@@ -313,8 +312,8 @@ class SymptomsFragment : Fragment(), MyItemSelected {
     }
 
     fun setSymptomSeverity(position: Int, date: LocalDate, intensity: String){
-        var selectedSymptom = listDb[position]
-        var sym_id = selectedSymptom.id + 43 //this will need to change to be one more than the size of the total record count in the listDb
+        val selectedSymptom = listDb[position]
+        val sym_id = selectedSymptom.id + 43 //this will need to change to be one more than the size of the total record count in the listDb
         val symptomsToday = getSelectedSymptomsForDate(date)
         val found = symptomsToday.filter {
                 item -> item.symptom == selectedSymptom.symptom

@@ -61,6 +61,7 @@ class HomeFragment : Fragment(), CalendarView.OnDateChangeListener {
     val myViewModel: MyViewModel by viewModels()
     val mEvents: MutableList<EventObject> = ArrayList<EventObject>()
     val defaultDateTimeFormat: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
+    val defaultShortDateFormat: DateTimeFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
 
     //Colours
     // initialise here but get correct values on view create
@@ -326,7 +327,9 @@ class HomeFragment : Fragment(), CalendarView.OnDateChangeListener {
         var days = 13
         while (days < 19) {
 
+
             val date = LocalDate.parse(symptom.date, defaultShortDateFormat).atStartOfDay()
+
                 .plusDays( -days.toLong())
                 .plusMonths(1)
             if (symptom.symptom == "Bleeding"){ //ToDo: workout how non-bleeding events ended up in here

@@ -31,6 +31,7 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.digitalinterruption.lex.R
 import com.digitalinterruption.lex.SharedPrefs
+import com.digitalinterruption.lex.database.MyDao
 import com.digitalinterruption.lex.databinding.FragmentSettingsBinding
 import com.digitalinterruption.lex.models.MyViewModel
 import com.digitalinterruption.lex.models.SymptomModel
@@ -48,6 +49,7 @@ import java.io.FileReader
 import java.io.FileWriter
 import java.time.LocalDate
 import java.time.LocalDateTime
+import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
 
@@ -61,8 +63,10 @@ class SettingsFragment : Fragment() {
     val myViewModel: MyViewModel by viewModels()
     var isExport: Boolean = false
     lateinit var prefs: SharedPrefs
-    private val defaultDateFormat: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
-    private val defaultShortDateFormat: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+
+    private val defaultShortDateFormat: DateTimeFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
+    private var clearDataClickCount: Int = 0
+
 
     private fun checkPinCollision(duressPin: String): Boolean {
         if (
@@ -92,6 +96,10 @@ class SettingsFragment : Fragment() {
 
         binding?.switchOwp?.isChecked = prefs.getOvulationEnabled()
         binding?.switchPms?.isChecked = prefs.getPmsEnabled()
+
+        binding?.clearData?.setOnClickListener {
+            clearDataButtonPress()
+        }
 
         binding?.ivHome?.setOnClickListener {
             moveToNext("Home")
@@ -298,12 +306,14 @@ class SettingsFragment : Fragment() {
                         lineCount += 1
                     }else{
 
+
                         nextLine?.let { nextLine ->
                             var parsedDate = ""
                             if (nextLine[1] != ""){
                                 parsedDate = LocalDate.parse(nextLine[1], DateTimeFormatter.ofPattern("dd/MM/yyyy"))
                                     .format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))
                             }
+
                             var _symptoms = SymptomModel(
                                     nextLine[0].toInt(), // id
                                     parsedDate,         // date
@@ -377,12 +387,16 @@ class SettingsFragment : Fragment() {
                 for (i in 0 until curCSV.columnCount) {
                     if (i==1){
                         if (curCSV.getString(i).isNotEmpty()){
+
                             arrStr[i] = curCSV.getString(i)
+
                         }else{
                             arrStr[i] = ""
                         }
                     }else{
-                    arrStr[i] = curCSV.getString(i)
+
+                      arrStr[i] = curCSV.getString(i)
+
                     }
                 }
                 csvWrite.writeNext(arrStr)
@@ -470,6 +484,36 @@ class SettingsFragment : Fragment() {
         }
     }
 
+    private fun clearDataButtonPress(){
+
+        if (clearDataClickCount > 1){
+            Log.d("settingsFragment", "data cleared")
+            //use the clearSymptoms function from the Dao
+            myViewModel.clearSymptoms()
+            clearDataClickCount = 0
+            Toast.makeText(
+                context,
+                "Data Cleared",
+                Toast.LENGTH_SHORT
+            ).show()
+            requireActivity().finishAndRemoveTask()
+        }else{
+            Toast.makeText(
+                context,
+                "Press again to clear data",
+                Toast.LENGTH_SHORT
+            ).show()
+            clearDataClickCount += 1
+            countDown = object: CountDownTimer(2000, 1000){
+            override fun onTick(millisUntilFinished: Long){}
+            override fun onFinish(){
+                clearDataClickCount = 0
+            }
+
+        }
+        countDown.start()
+        }
+    }
     private fun fragmentBackPress() {
         callback = object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
